@@ -1,0 +1,1671 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<!-- نسخهٔ ادامهٔ بازی زندگی شهری؛ پنل‌های مدیریتی عمداً تا احراز هویت سروری قفل هستند. کدهای محرمانه نباید داخل HTML قرار بگیرند. -->
+<title>زندگی شهری | شهر آزاد ایرانی</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#101c2c;color:#fff;font-family:Tahoma,Arial,sans-serif;touch-action:none}canvas{position:absolute;inset:0;width:100%;height:100%}
+#hud{position:absolute;z-index:3;right:10px;top:10px;width:min(190px,29vw);background:linear-gradient(145deg,#0b1d34f5,#071425f5);border:1.5px solid #314a66;border-radius:13px;padding:5px 6px;box-shadow:0 4px 10px #0008;font-size:clamp(8px,1.35vw,10px)}
+.row{display:flex;justify-content:space-between;align-items:center;gap:6px;margin-bottom:7px}.big{font-size:1.25em;font-weight:bold}.bar{height:11px;border-radius:10px;background:#233b4e;overflow:hidden;margin:8px 0}.fill{height:100%;width:100%;background:#42df82}.pill{border-radius:16px;background:#103852;border:1px solid #2d6885;padding:8px;text-align:center;margin-top:8px}
+#top{position:absolute;z-index:4;left:12px;top:12px;display:flex;gap:7px}.btn{font-family:inherit;color:white;border:1px solid #6787a5;background:linear-gradient(#3e6285,#203b5a);border-radius:17px;padding:10px 13px;min-height:50px;box-shadow:0 4px 9px #0005;font-size:clamp(11px,2vw,15px)}.green{background:linear-gradient(#24b38f,#08715c)}.cyan{background:linear-gradient(#24b6d4,#087999)}
+#right{position:absolute;z-index:4;right:12px;bottom:14px;display:flex;flex-direction:column;gap:8px}.act{width:65px;height:65px;border-radius:20px;border:1px solid #a3a4ff;background:linear-gradient(145deg,#9064ff,#5830c7);color:white;font-size:23px;box-shadow:0 5px 12px #0006}.act.green{background:linear-gradient(145deg,#39d3ae,#087b70)}.act small{display:block;font-size:10px;font-family:Tahoma}
+#joy{position:absolute;z-index:4;left:18px;bottom:17px;width:130px;height:130px;border-radius:50%;background:#183956c9;border:2px solid #6685a077;display:grid;place-items:center;box-shadow:inset 0 0 20px #a8dcff22}#nub{width:63px;height:63px;border-radius:50%;background:radial-gradient(circle at 35% 25%,#b3e9ff,#3894c9);border:3px solid #a9ddff;box-shadow:0 4px 10px #0008}
+#toast{display:none;position:fixed;z-index:10000;top:72px;left:50%;transform:translateX(-50%);background:#08192deF;border:1px solid #5b7b99;border-radius:18px;padding:10px 15px;text-align:center;max-width:85vw}
+#modal{display:none;pointer-events:auto;position:absolute;z-index:30;inset:10% 7%;overflow:auto;background:#0b1a2af5;border:2px solid #496b89;border-radius:22px;padding:18px;box-shadow:0 15px 50px #0009}#modal h2{margin:0 0 12px}#modal p{line-height:1.8}#modal button{position:relative;z-index:31;pointer-events:auto;touch-action:manipulation;font-family:inherit;background:#147c9b;color:white;border:0;border-radius:12px;padding:10px 13px;margin:5px}
+#phoneApps{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:12px}
+.appTile{min-height:112px;border-radius:22px;border:1px solid #91a9ca;color:white;font-family:Tahoma;background:linear-gradient(145deg,#8b68df,#563bb0);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;padding:8px;font-size:13px}
+.appTile:nth-child(3n+2){background:linear-gradient(145deg,#35b89d,#167965)}.appTile:nth-child(3n){background:linear-gradient(145deg,#e2aa4d,#8c5a27)}
+#modal.phoneMode{inset:3% auto 3% 50%;transform:translateX(-50%);width:min(410px,94vw);border-radius:38px;background:radial-gradient(ellipse at 15% 8%,#315b91 0%,#172f55 34%,#091629 75%);border:3px solid #64758d;padding:44px 16px 32px;overflow-y:auto;overflow-x:hidden;box-shadow:0 0 0 2px #0a0e16,0 22px 70px #000d;scrollbar-width:thin}
+#modal.phoneMode:before{content:"◉  13:37                         ▮▮▮  Wi-Fi  87%";position:absolute;top:13px;right:25px;left:25px;height:22px;font-size:10px;letter-spacing:.3px;color:#f7fbff;z-index:2;pointer-events:none}
+#modal.phoneMode:after{content:"";position:sticky;display:block;bottom:-23px;margin:14px auto -21px;width:100px;height:4px;border-radius:9px;background:#f4f7ff;opacity:.85;box-shadow:0 0 0 1px #ffffff20;pointer-events:none}
+#modal.phoneMode h2{text-align:center;font-size:20px;margin:4px 0 8px;text-shadow:0 2px 8px #0008}
+#modal.phoneMode #mtext{text-align:center;color:#d3e6ff;font-size:12px;margin:0 0 14px}
+#modal.phoneMode #actions{background:#ffffff12;border:1px solid #ffffff1c;border-radius:25px;padding:12px;min-height:230px}
+#phoneApps{grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:0}
+#modal.phoneMode .appTile{min-height:94px;border:1px solid #ffffff42;border-radius:23px;background:linear-gradient(145deg,#8d7bfae8,#4d3ab9e8);box-shadow:0 6px 13px #0003;font-size:11px;font-weight:bold;gap:8px;backdrop-filter:blur(8px)}
+#modal.phoneMode .appTile:nth-child(3n+2){background:linear-gradient(145deg,#45d7b7e8,#087f78e8)}
+#modal.phoneMode .appTile:nth-child(3n){background:linear-gradient(145deg,#f5c36ae8,#a85b24e8)}
+#modal.phoneMode .appTile:active{transform:scale(.96)}
+#phoneApps .appTile span:first-child{font-size:29px;filter:drop-shadow(0 2px 2px #0004)}
+#modal.phoneMode>button:last-child{display:block;margin:16px auto 0;background:#ffffff1c;border:1px solid #ffffff42;border-radius:18px;padding:8px 24px}
+#wheelDisk{width:min(68vw,260px);height:min(68vw,260px);max-width:260px;max-height:260px;border-radius:50%;margin:14px auto;position:relative;border:7px solid #f4d36c;box-shadow:0 0 0 4px #754d20,0 8px 18px #0008;background:conic-gradient(#e94f55 0deg 72deg,#f0b83f 72deg 144deg,#28a989 144deg 216deg,#4a8ee8 216deg 288deg,#9864df 288deg 360deg);transition:transform 2.2s cubic-bezier(.12,.72,.12,1)}
+#wheelDisk:after{content:"🎁";position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:54px;height:54px;border-radius:50%;display:grid;place-items:center;background:#fff;color:#222;font-size:28px;border:4px solid #f4d36c}
+#wheelPointer{font-size:28px;text-align:center;margin-bottom:-24px;position:relative;z-index:1;color:#ffe58a;text-shadow:0 2px 5px #000}
+@media(max-width:600px){#phoneApps{gap:8px}#modal.phoneMode{inset:2% auto 2% 50%;width:94vw;padding:42px 12px 28px;border-radius:34px}#modal.phoneMode .appTile{min-height:84px;font-size:10px;border-radius:20px}}
+#hint{position:absolute;z-index:2;bottom:5px;left:50%;transform:translateX(-50%);font-size:10px;color:#ffffff9c;white-space:nowrap}
+@media(max-width:600px){#hud{top:6px;right:6px;padding:4px 5px;width:28vw;border-radius:11px;font-size:8px;border-width:1px}.bar{height:5px;margin:3px 0}.pill{padding:3px;margin-top:3px}.row{margin-bottom:2px}#top{top:7px;left:7px;gap:4px}.btn{padding:7px 8px;min-height:43px;border-radius:13px}#joy{width:108px;height:108px;left:9px;bottom:11px}#nub{width:53px;height:53px}#right{right:8px;bottom:11px}.act{width:57px;height:57px;border-radius:16px}}
+
+#showroomEnter,#restaurantEnter,#cinemaEnter{display:none;position:absolute;z-index:8;left:50%;top:82px;transform:translateX(-50%);background:linear-gradient(135deg,#f2c14e,#a96a10);color:#241400;border:2px solid #ffe8a3;border-radius:16px;padding:12px 18px;font-family:Tahoma;font-weight:900;font-size:15px;box-shadow:0 6px 18px #0009;white-space:nowrap}
+#restaurantEnter{top:140px;background:linear-gradient(135deg,#42d392,#087b57);color:#fff;border-color:#a7ffcf}
+#cafeEnter{display:none;position:absolute;z-index:8;left:50%;top:198px;transform:translateX(-50%);background:linear-gradient(135deg,#b97842,#63351f);color:#fff;border:2px solid #f5d0a8;border-radius:16px;padding:12px 18px;font-family:Tahoma;font-weight:900;font-size:15px;box-shadow:0 6px 18px #0009;white-space:nowrap}
+#backpackBtn{position:absolute;z-index:8;left:50%;bottom:18px;transform:translateX(-50%);border:2px solid #f7d58a;border-radius:15px;background:linear-gradient(135deg,#dca642,#8d5a16);color:#fff;font:900 13px Tahoma;padding:10px 15px;box-shadow:0 4px 12px #0008;white-space:nowrap}
+@media(max-width:600px){#backpackBtn{bottom:10px;padding:8px 11px;font-size:11px;left:50%}}
+#supermarketEnter{display:none;position:absolute;z-index:8;left:50%;top:196px;transform:translateX(-50%);background:linear-gradient(135deg,#43d17c,#176a36);color:#fff;border:2px solid #baffc8;border-radius:16px;padding:12px 18px;font-family:Tahoma;font-weight:900;font-size:15px;box-shadow:0 6px 18px #0009;white-space:nowrap}
+#clothingEnter{display:none;pointer-events:auto;position:absolute;z-index:20;left:50%;top:312px;transform:translateX(-50%);background:linear-gradient(135deg,#e879c7,#9d286f);color:#fff;border:2px solid #ffc9f0;border-radius:16px;padding:12px 18px;font-family:Tahoma;font-weight:900;font-size:15px;box-shadow:0 6px 18px #0009;white-space:nowrap}
+#bankEnter{display:none;position:absolute;z-index:8;left:50%;top:254px;transform:translateX(-50%);background:linear-gradient(135deg,#d8b45b,#8c6216);color:#241400;border:2px solid #ffedaa;border-radius:16px;padding:12px 18px;font-family:Tahoma;font-weight:900;font-size:15px;box-shadow:0 6px 18px #0009;white-space:nowrap}
+#fuelEnter{display:none;position:absolute;z-index:8;left:50%;top:198px;transform:translateX(-50%);background:linear-gradient(135deg,#5bc0eb,#1769aa);color:#fff;border:2px solid #bcecff;border-radius:16px;padding:12px 18px;font-family:Tahoma;font-weight:900;font-size:15px;box-shadow:0 6px 18px #0009;white-space:nowrap}
+#fuelDisplay{display:none;position:absolute;z-index:11;left:170px;bottom:76px;top:auto;transform:none;background:#07192ae8;border:1px solid #a7e8ff;border-radius:12px;padding:7px 10px;color:#fff;font:bold 13px Tahoma;white-space:nowrap}
+#wheelReadyNotice{position:fixed;z-index:9999;top:58px;left:50%;transform:translateX(-50%);width:max-content;max-width:92vw;background:linear-gradient(135deg,#0b735f,#119b83);color:#fff;border:2px solid #8fffe2;border-radius:15px;padding:11px 16px;box-shadow:0 6px 22px #0008;font-weight:800;font-size:15px;text-align:center;display:none;animation:wheelNoticePulse 1.8s ease-in-out infinite}
+#wheelReadyNotice button{margin-right:10px;background:#ffffff22;border:0;border-radius:8px;color:white;font-size:17px;padding:2px 7px}
+@keyframes wheelNoticePulse{0%,100%{box-shadow:0 6px 18px #0008}50%{box-shadow:0 6px 24px #5effd988}}
+@media(max-width:600px){#speedometer{top:8px;min-width:100px;padding:6px 12px}#speedometer .speedNum{font-size:25px}}
+@media(max-width:600px){#wheelReadyNotice{top:58px;font-size:13px;padding:8px 10px}}
+@media(max-width:600px){
+ #fuelDisplay{left:105px;bottom:68px;max-width:43vw;font-size:11px;padding:6px 7px}
+ #speedometer{right:76px;bottom:190px;min-width:78px;padding:6px 7px}
+ #speedometer .speedNum{font-size:23px}
+ #speedometer .speedUnit{font-size:9px}
+}
+
+/* فرمان واقعی چرخشی + پدال گاز و ترمز */
+#driveControls{display:none;background:transparent!important;border:0!important;padding:0!important;box-shadow:none!important;left:auto!important;right:calc(14px + 5vw)!important;bottom:18px!important;transform:none!important;gap:12px!important;flex-direction:column!important}
+#driveControls .act{width:66px!important;height:82px!important;min-width:66px;border-radius:18px 18px 13px 13px!important;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:5px;font-size:25px;line-height:1.05;border:2px solid #c7e4ff;box-shadow:0 5px 10px #0008;touch-action:none}
+#driveControls .act small{font-size:12px!important;margin-top:5px}
+#driveControls #steerL,#driveControls #steerR{display:none!important}
+#driveControls #gas{background:linear-gradient(145deg,#43e38b,#087a50)!important;border-radius:18px 18px 12px 12px!important}
+#driveControls #brake{background:linear-gradient(145deg,#ff6969,#9c2020)!important;border-radius:18px 18px 12px 12px!important}
+#speedometer{display:none;position:absolute;z-index:11;left:auto;right:92px;top:auto;bottom:205px;transform:none;min-width:104px;padding:8px 10px;text-align:center;border-radius:16px;background:linear-gradient(145deg,#071a2eee,#163b56ee);border:2px solid #8bd8ff;box-shadow:0 4px 14px #0008;font-weight:900;pointer-events:none}#speedometer .speedNum{font-size:28px;line-height:1.1;color:#fff}#speedometer .speedUnit{font-size:11px;color:#aee7ff}
+#steerJoy{display:none;position:absolute;z-index:7;left:14px;bottom:16px;width:min(34vw,180px);height:min(34vw,180px);min-width:110px;min-height:110px;border-radius:50%;background:radial-gradient(circle,#7d4b2b 0 58%,#bd7844 59% 66%,#6c3d22 68% 72%,transparent 73%);box-shadow:0 5px 14px #0009,inset 0 0 0 5px #d2945f;touch-action:none;align-items:center;justify-content:center;transform:rotate(0deg)}
+#steerJoy:before{content:"";position:absolute;left:12%;right:12%;top:43%;height:14%;border-radius:12px;background:linear-gradient(#222,#050505 45%,#353535);box-shadow:0 1px 2px #ddd8;pointer-events:none}
+#steerJoy:after{content:"";position:absolute;top:42%;left:43%;width:14%;height:29%;border-radius:8px;background:linear-gradient(90deg,#111,#444,#080808);transform:translateY(0);pointer-events:none}
+#steerNub{width:30%;height:30%;border-radius:50%;background:radial-gradient(circle at 35% 25%,#555,#151515 65%,#050505);border:5px solid #777;box-shadow:0 2px 4px #000b,inset 0 0 0 3px #292929;pointer-events:none;position:relative;z-index:2}
+#steerNub:after{content:"";position:absolute;inset:20%;border:2px dotted #999;border-radius:50%}
+@media(max-width:600px){#steerJoy{left:10px;bottom:14px;width:44vw;height:44vw;min-width:145px;min-height:145px}}
+@media(max-width:600px){#steerJoy{left:10px;bottom:14px;width:29vw;height:29vw;min-width:92px;min-height:92px;max-width:145px;max-height:145px}#driveControls{right:10px!important;bottom:15px!important;gap:9px!important}#driveControls .act{width:58px!important;height:72px!important;min-width:58px}}
+/* دکمه‌های تعامل، ماشین و گوشی کوچک‌تر */
+#right{gap:5px!important;right:9px!important;bottom:10px!important}
+#right .act{width:46px;height:46px;border-radius:13px;font-size:18px;padding:3px;box-shadow:0 3px 7px #0006}
+#right .act small{font-size:8px;line-height:1.1}
+@media(max-width:600px){#right{gap:4px!important;right:6px!important;bottom:7px!important}#right .act{width:42px;height:42px;border-radius:12px;font-size:16px}#right .act small{font-size:7px}}
+
+#snapPanel{direction:rtl;color:#172334;text-align:right}
+#snapMap{width:100%;height:clamp(260px,43vh,430px);border:3px solid #42617d;border-radius:14px;background:#b9d9a8;display:block;touch-action:manipulation;cursor:crosshair}
+#snapMapWrap{position:relative;z-index:2;touch-action:manipulation;overflow:hidden;border-radius:14px}
+#snapPanel .snapChoice button{min-height:48px;font-size:14px;position:relative;z-index:5;touch-action:manipulation;cursor:pointer}
+#snapPanel .snapChoice button.selected{outline:3px solid #f2c14e;box-shadow:0 0 0 2px #fff}
+#snapPanel .snapGo{position:relative;z-index:5;min-height:50px;touch-action:manipulation}
+#snapMap text{font-family:Tahoma,Arial,sans-serif;pointer-events:none}
+.snapChoice{display:flex;gap:7px;margin:8px 0}
+.snapChoice button{flex:1;padding:10px 5px;border:0;border-radius:10px;background:#e7edf4;color:#172334;font-family:Tahoma;font-weight:bold}
+.snapChoice button.selected{background:#176caa;color:#fff}
+#snapPanel .snapGo{width:100%;padding:13px;border:0;border-radius:12px;background:#1b9a68;color:white;font-family:Tahoma;font-weight:bold;font-size:15px;margin-top:8px}
+#snapPanel .snapHint{font-size:12px;line-height:1.8;color:#334155}
+
+#snapBoardBtn{position:fixed;z-index:9999;left:50%;bottom:calc(105px + env(safe-area-inset-bottom));transform:translateX(-50%);display:none;border:3px solid #fff;border-radius:16px;background:#159b63;color:#fff;padding:14px 24px;font:bold 16px Tahoma;box-shadow:0 5px 18px #0009;min-width:210px;touch-action:manipulation}
+</style>
+<style id="gasPedalLeftFix">
+@media(max-width:900px){
+ #driveControls{right:calc(14px + 12vw)!important;left:auto!important}
+ #driveControls #gas,#driveControls #brake{position:relative!important;left:0!important;right:auto!important}
+}
+</style>
+
+<style id="reportedFixes">
+#steerJoy{width:min(25vw,132px)!important;height:min(25vw,132px)!important;min-width:82px!important;min-height:82px!important;box-shadow:0 3px 9px #0008,inset 0 0 0 3px #d2945f!important}
+#speedometer{min-width:58px!important;padding:3px 5px!important;border-width:1px!important;border-radius:9px!important}
+#speedometer .speedNum{font-size:15px!important;line-height:1!important}
+#speedometer .speedUnit{font-size:8px!important}
+#fuelDisplay{position:fixed!important;left:12px!important;right:auto!important;top:auto!important;bottom:76px!important;transform:none!important;font-size:11px!important;padding:5px 7px!important}
+@media(max-width:600px){#speedometer{right:76px!important;bottom:190px!important;min-width:54px!important}#speedometer .speedNum{font-size:14px!important}#fuelDisplay{left:10px!important;bottom:76px!important}}
+</style>
+
+<style id="threeDVisualUpgrade">
+/* نمای سه‌بعدی‌نما برای نسخهٔ موبایل؛ رابط‌ها و منطق بازی دست‌نخورده می‌مانند. */
+body{background:radial-gradient(ellipse at 50% 30%,#547b78 0%,#203b3c 65%,#101c2c 100%)}
+#c{transform:perspective(1100px) rotateX(7deg) scale(1.045);transform-origin:50% 58%;filter:saturate(1.12) contrast(1.04);}
+#hud,#top,#right,#joy,#steerJoy,#driveControls,#speedometer,#fuelDisplay,#hint,#modal,#toast,#roleTag{filter:drop-shadow(0 2px 4px #0008)}
+#hint::after{content:'  •  نمای سه‌بعدی‌نما';color:#8ee7ff}
+</style>
+
+
+<style id="portraitGameLayout">
+/* چیدمان اختصاصی حالت عمودی موبایل */
+@media (orientation: portrait) and (max-width: 800px) {
+  html,body { width:100%; height:100%; min-height:100%; overflow:hidden; }
+  canvas#world3d { filter:saturate(1.08) contrast(1.035); }
+  canvas#c { width:100vw!important; height:100dvh!important; inset:0!important; transform:none!important; }
+  #hud { top:6px!important; right:6px!important; width: min(42vw,170px)!important; max-width:42vw!important; font-size:9px!important; }
+  #top { top:6px!important; left:6px!important; right:auto!important; gap:4px!important; max-width:55vw; flex-wrap:wrap; }
+  #top .btn { min-height:36px!important; padding:6px 8px!important; font-size:10px!important; }
+  #joy { left:10px!important; bottom:18px!important; width:100px!important; height:100px!important; }
+  #nub { width:48px!important; height:48px!important; }
+  #steerJoy { left:10px!important; bottom:15px!important; width:112px!important; height:112px!important; min-width:112px!important; min-height:112px!important; max-width:112px!important; max-height:112px!important; }
+  #driveControls { right:10px!important; left:auto!important; bottom:16px!important; gap:7px!important; }
+  #driveControls .act { width:52px!important; min-width:52px!important; height:65px!important; padding:3px!important; font-size:17px!important; }
+  #driveControls .act small { font-size:8px!important; }
+  #right { right:5px!important; bottom:142px!important; gap:4px!important; }
+  #right .act { width:38px!important; height:38px!important; font-size:14px!important; border-radius:11px!important; }
+  #right .act small { font-size:7px!important; }
+  #speedometer { right:72px!important; left:auto!important; bottom:105px!important; top:auto!important; min-width:55px!important; padding:4px!important; }
+  #speedometer .speedNum { font-size:16px!important; }
+  #fuelDisplay { left:8px!important; bottom:130px!important; max-width:42vw!important; font-size:10px!important; }
+  #backpackBtn { bottom:8px!important; left:50%!important; transform:translateX(-50%)!important; }
+  #modal { inset:5% 4%!important; padding:14px!important; }
+  #modal.phoneMode { inset:2% auto 2% 50%!important; width:min(390px,94vw)!important; padding:42px 12px 28px!important; }
+  #toast { top:72px!important; max-width:90vw!important; z-index:10000!important; }
+}
+@media (orientation: landscape) and (max-height: 500px) {
+  #hint::after { content:' • برای چیدمان عمودی گوشی را بچرخانید'; color:#8ee7ff; }
+}
+</style>
+
+
+<style>html,body{background:#24443f!important}#c{display:block!important;visibility:visible!important;opacity:1!important}#world3d{display:none!important;visibility:hidden!important}#top,#hud,#joy,#right,#speedometer,#steerJoy,#driveControls,#toast,#modal,#hint,#roleTag{z-index:10}</style>
+
+</head>
+<body><button id="snapBoardBtn" type="button">🚕 سوار شدن به اسنپ</button>
+<canvas id="c"></canvas>
+<button id="showroomEnter">🏢 ورود به نمایشگاه</button>
+<button id="restaurantEnter">🍽️ ورود به رستوران</button>
+<button id="cafeEnter">☕ ورود به کافه</button>
+<button id="supermarketEnter">🛒 ورود به سوپرمارکت</button>
+<button id="backpackBtn">🎒 کوله‌پشتی <span id="bagCount">۰</span></button>
+<button id="fuelEnter">⛽ بنزین زدن</button>
+<button id="bankEnter">🏦 ورود به بانک</button>
+<button id="clothingEnter">👕 ورود به فروشگاه لباس</button>
+<button id="cinemaEnter">🎬 ورود به سینما</button>
+<div id="fuelDisplay">⛽ بنزین: <b id="fuelValue">۳۰</b> / ۶۰ لیتر</div>
+<div id="wheelReadyNotice" role="status">🎡 گردونه شما آماده است! <button id="dismissWheelNotice" aria-label="بستن">×</button></div>
+<div id="cityAnnouncement" role="status" style="display:none;position:fixed;z-index:9998;top:112px;left:50%;transform:translateX(-50%);width:min(92vw,560px);background:linear-gradient(135deg,#8a2020,#c94b32);color:#fff;border:2px solid #ffd36a;border-radius:16px;padding:12px 16px;box-shadow:0 6px 24px #000a;text-align:center;font-weight:800;line-height:1.8"><div>📢 اعلامیه رئیس‌جمهور</div><div id="cityAnnouncementText" style="font-weight:500"></div><button id="dismissCityAnnouncement" style="margin-top:6px;border:0;border-radius:8px;padding:6px 12px;background:#ffffff22;color:#fff;font-family:Tahoma">متوجه شدم</button></div>
+<div id="top"><button class="btn" id="map">🗺️ نقشه</button><button class="btn cyan" id="phone">📱</button><button class="btn green" id="sound">🔊 صدا</button></div>
+<div id="hud">
+ <div class="row"><span>🌙 شب</span><span class="big"><b id="coins">1500</b> 🪙</span></div>
+ <div class="row"><span>🍔 گرسنگی: <b id="hunger">50</b></span><span>HP: <b id="hp">70</b> ❤️</span></div>
+ <div class="row"><span>سطح <b id="level">5</b> ⭐</span><span><b id="stars">15</b> ⭐</span></div>
+ <div class="bar"><div class="fill" id="hpbar"></div></div>
+ <div class="row"><span>شهروند تازه‌کار</span><span>🎒</span></div>
+ <div class="pill">⭐ اعتبار شهر: <b id="rep">10</b></div>
+</div>
+<div id="roleTag" style="position:absolute;z-index:3;display:none;pointer-events:none;transform:translate(-50%,-100%);background:#09243beF;border:1px solid #8bd5ff;border-radius:12px;padding:4px 8px;font-size:12px;font-weight:bold;white-space:nowrap;box-shadow:0 3px 8px #0007">شهروند</div>
+<div id="joy"><div id="nub"></div></div>
+<div id="right"><button class="act green" id="interact">🖐️<small>تعامل</small></button><button class="act" id="run">🏃<small>دویدن</small></button><button class="act" id="carbtn">🚗<small>ماشین</small></button><button class="act green" id="phoneQuick">📱<small>گوشی</small></button></div>
+<button id="buildingEntryBtn" type="button" style="display:none;position:fixed;z-index:30;left:50%;top:50%;transform:translate(-50%,-50%);padding:8px 13px;border:1px solid #ffe08a;border-radius:12px;background:linear-gradient(135deg,#176b9a,#103b61);color:#fff;font: bold 13px Tahoma;box-shadow:0 4px 16px #0009;white-space:nowrap;max-width:85vw">🚪 ورود به ساختمان</button>
+<div id="speedometer"><div class="speedNum"><span id="speedValue">0</span></div><div class="speedUnit">کیلومتر بر ساعت</div></div><div id="steerJoy"><div id="steerNub"></div></div><div id="driveControls" style="display:none;position:absolute;z-index:7;left:50%;bottom:18px;transform:translateX(-50%);gap:8px;align-items:center;direction:ltr;background:#07192acc;padding:8px;border:1px solid #7ab6d8;border-radius:18px"><button class="act" id="steerL" style="background:linear-gradient(#3e8bd0,#17466e)">⬅️<small>چپ</small></button><button class="act green" id="gas" style="width:68px;height:68px">🟢<small>گاز</small></button><button class="act" id="brake" style="background:linear-gradient(#d95353,#8b2222)">🛑<small>ترمز</small></button><button class="act" id="steerR" style="background:linear-gradient(#3e8bd0,#17466e)">➡️<small>راست</small></button></div><div id="toast"></div><div id="modal"><h2 id="mtitle">شهر آزاد</h2><p id="mtext"></p><div id="actions"></div><button onclick="document.getElementById('modal').style.display='none';document.getElementById('modal').classList.remove('phoneMode')">بستن ✖</button></div>
+<div id="hint">جوی‌استیک را بکش تا حرکت کنی • برای تعامل با ساختمان‌ها یا مزرعه، دکمه «تعامل» را بزن</div>
+<script>
+(()=>{
+const cv=document.getElementById('c'),g=cv.getContext('2d');let W=innerWidth,H=innerHeight,D=Math.min(devicePixelRatio||1,1.25);
+function resize(){W=innerWidth;H=innerHeight;cv.width=W*D;cv.height=H*D;cv.style.width=W+'px';cv.style.height=H+'px';g.setTransform(D,0,0,D,0,0)}addEventListener('resize',resize);resize();
+const CW=6800,CH=2050,CITYW=2200,roadW=58,blockW=335,blockH=270,stepX=393,stepY=328;
+let p={x:1250,y:970,dir:0,car:false,run:false,inSnapPassenger:false,carColor:'#159a99'},cam={x:0,y:0},coins=1500,hunger=50,hp=70,stars=0,rep=10,level=5;
+const foodItems=[{id:'tt',name:'تی‌تاپ طلایی',price:45,fill:25,heal:0,emoji:'🍰'},{id:'choco',name:'شیرکاکائو',price:65,fill:50,heal:0,emoji:'🥛'},{id:'juice',name:'آبمیوه',price:75,fill:65,heal:0,emoji:'🧃'},{id:'kim',name:'بستنی کیم',price:85,fill:75,heal:0,emoji:'🍦'},{id:'milk',name:'شیر پاکتی',price:95,fill:85,heal:0,emoji:'🥛'},{id:'nadlit',name:'ندلیت',price:100,fill:100,heal:0,emoji:'🍫'},
+{id:'joojeh',name:'جوجه‌کباب',price:150,fill:25,heal:30,emoji:'🍗'},{id:'burger',name:'همبرگر',price:200,fill:35,heal:50,emoji:'🍔'},{id:'falafel',name:'فلافل',price:250,fill:40,heal:70,emoji:'🧆'},{id:'kebab',name:'کباب',price:300,fill:45,heal:90,emoji:'🥩'},{id:'ghimeh',name:'خورشت قیمه',price:330,fill:50,heal:100,emoji:'🍲'},
+{id:'coffee',name:'قهوه',price:35,fill:25,heal:0,emoji:'☕'},{id:'omelet',name:'املت',price:50,fill:45,heal:0,emoji:'🍳'},{id:'espresso',name:'اسپرسو',price:70,fill:50,heal:0,emoji:'☕'}];
+let backpack={};try{backpack=JSON.parse(localStorage.getItem('shahrAzad_backpack')||'{}')||{}}catch(e){backpack={}}
+let backpackCapacity=3;try{backpackCapacity=Math.max(3,Math.min(10,Number(localStorage.getItem('shahrAzad_backpackCapacity'))||3))}catch(e){}
+function backpackUsed(){return Object.values(backpack).reduce((a,b)=>a+Math.max(0,Math.floor(Number(b)||0)),0)}
+function saveBackpack(){try{localStorage.setItem('shahrAzad_backpack',JSON.stringify(backpack));localStorage.setItem('shahrAzad_backpackCapacity',String(backpackCapacity))}catch(e){}updateBagCount()}
+function updateBagCount(){const n=backpackUsed();const e=document.getElementById('bagCount');if(e)e.textContent=n.toLocaleString('fa-IR')+' / '+backpackCapacity.toLocaleString('fa-IR')}
+function addBackpackItem(id){if(backpackUsed()>=backpackCapacity){toast('کوله‌پشتی پر است! اول یک جایگاه با ۲٬۰۰۰ سکه باز کن یا وسیله‌ای مصرف کن.');return false}backpack[id]=(Number(backpack[id])||0)+1;saveBackpack();return true}
+function openBackpack(){
+ const used=backpackUsed(),opts=[];
+ foodItems.forEach(it=>{const count=Number(backpack[it.id])||0;if(count>0)opts.push([it.emoji+' '+it.name+' × '+count+' — استفاده / خوردن',()=>{if((Number(backpack[it.id])||0)<=0)return;backpack[it.id]--;if(backpack[it.id]<=0)delete backpack[it.id];hunger=Math.min(100,hunger+(Number(it.fill)||0));hp=Math.min(100,hp+(Number(it.heal)||0));saveBackpack();hud();close();toast(it.name+' استفاده شد؛ جون: '+hp+' • سیری: '+hunger+' ❤️') }])});
+ if(backpackCapacity<10)opts.push(['🔓 بازکردن یک جایگاه بیشتر — ۲٬۰۰۰ سکه ('+backpackCapacity+' از ۱۰)',()=>{if(coins<2000){toast('برای بازکردن جایگاه، ۲٬۰۰۰ سکه لازم داری');return}coins-=2000;backpackCapacity++;saveBackpack();hud();toast('یک جایگاه کوله‌پشتی باز شد! ظرفیت: '+backpackCapacity+' از ۱۰');openBackpack()}]);
+ if(!opts.length)opts.push(['کوله‌پشتی خالی است؛ از سوپرمارکت، رستوران یا کافه خرید کن',()=>close()]);
+ modal('🎒 کوله‌پشتی','ظرفیت: '+used+' از '+backpackCapacity+' جایگاه پر است. ظرفیت کل ۱۰ جایگاه؛ ۳ جایگاه اول رایگان و هر جایگاه اضافه ۲٬۰۰۰ سکه است.',opts)
+}
+document.getElementById('backpackBtn').onclick=openBackpack;updateBagCount();
+let fuelLiters=30; // باک ماشین در شروع ۳۰ لیتر از ظرفیت ۶۰ لیتری
+const shopCars=[{id:'pars_white',name:'پژو پارس سفید',price:15000,color:'#f4f4ee',icon:'🚘',speed:120},{id:'405_black',name:'پژو ۴۰۵ مشکی',price:10000,color:'#20242b',icon:'🚙',speed:120},{id:'pride_gray',name:'پراید طوسی',price:5000,color:'#858b91',icon:'🚗',speed:100},{id:'honda_cub',name:'موتور هوندا کپ هوندا',price:20000,color:'#d92727',icon:'🏍️',speed:75},{id:'cibi1300',name:'موتور سیبی ۱۳۰۰',price:35000,color:'#20242b',icon:'🏍️',speed:100},{id:'kawasaki',name:'موتور کاوازاکی',price:55000,color:'#35b94a',icon:'🏍️',speed:150},{id:'click_motor',name:'موتور کلیک',price:38000,color:'#222831',icon:'🏍️',speed:50},{id:'aventador',name:'لامبورگینی اونتادور',price:40000,color:'#d6b900',icon:'🏎️',speed:145}];
+let ownedCars=['starter'],selectedCar='starter';
+const GARAGE_SAVE_KEY='shahrAzad_garage_v2';
+const GARAGE_OWNED_KEY='shahrAzad_ownedVehicles_v3';
+const PARKED_CARS_KEY='shahrAzad_parkedVehicles_v3';
+const GARAGE_PERMANENT_KEY='shahrAzad_ownedCars_permanent_v4';
+function writeGarageSnapshot(){
+  try{
+    const valid=id=>id==='starter'||shopCars.some(c=>c.id===id);
+    const safeOwned=[...new Set(['starter',...ownedCars.filter(valid)])];
+    const stamp=Date.now();
+    const safeSelected=valid(selectedCar)&&safeOwned.includes(selectedCar)?selectedCar:'starter';
+    const snapshot={version:4,savedAt:stamp,ownedCars:safeOwned,selectedCar:safeSelected};
+    const raw=JSON.stringify(snapshot);
+    // ذخیرهٔ مستقل و دائمی مالکیت خودروها، جدا از ذخیرهٔ کلی بازی
+    localStorage.setItem(GARAGE_PERMANENT_KEY,raw);
+    localStorage.setItem('shahrAzad_garage',raw);
+    localStorage.setItem(GARAGE_SAVE_KEY,raw);
+    localStorage.setItem('shahrAzad_garage_backup',raw);
+    localStorage.setItem(GARAGE_OWNED_KEY,raw);
+    selectedCar=safeSelected;
+    return true;
+  }catch(e){return false;}
+}
+function saveGarage(){writeGarageSnapshot();try{if(typeof saveFullGame==='function')saveFullGame()}catch(e){}}
+function restoreGaragePersistence(){
+  try{
+    const candidates=[GARAGE_PERMANENT_KEY,'shahrAzad_garage',GARAGE_SAVE_KEY,'shahrAzad_garage_backup',GARAGE_OWNED_KEY].map(k=>{try{return JSON.parse(localStorage.getItem(k)||'null')}catch(e){return null}}).filter(v=>v&&Array.isArray(v.ownedCars));
+    try{const full=JSON.parse(localStorage.getItem('shahrAzad_fullProgress_v1')||'null');if(full&&full.garage&&Array.isArray(full.garage.ownedCars))candidates.push({savedAt:Number(full.savedAt)||0,ownedCars:full.garage.ownedCars,selectedCar:full.garage.selectedCar});}catch(e){}
+    if(!candidates.length)return;
+    const valid=id=>id==='starter'||shopCars.some(c=>c.id===id);
+    const merged=[...new Set(['starter',...candidates.flatMap(v=>v.ownedCars).filter(valid)])];
+    ownedCars=merged;
+    candidates.sort((a,b)=>(Number(b.savedAt)||0)-(Number(a.savedAt)||0));
+    const preferred=candidates.find(v=>typeof v.selectedCar==='string'&&valid(v.selectedCar)&&merged.includes(v.selectedCar));
+    if(preferred)selectedCar=preferred.selectedCar;
+    writeGarageSnapshot();
+  }catch(e){}
+}
+try{const gs=JSON.parse(localStorage.getItem('shahrAzad_garage')||'null');if(gs&&Array.isArray(gs.ownedCars))ownedCars=[...new Set(['starter',...gs.ownedCars])];if(gs&&typeof gs.selectedCar==='string')selectedCar=gs.selectedCar}catch(e){}
+function selectedVehicle(){return shopCars.find(c=>c.id===selectedCar)||{id:'starter',name:'سدان شهری',color:'#159a99',icon:'🚗'}}
+function syncCarButton(){const b=document.getElementById('carbtn');if(!b)return;b.innerHTML=p.car?'🚶<small>راه رفتن</small>':'🚗<small>ماشین</small>';b.title=p.car?'پیاده شو و با اسکین راه برو':'نزدیک ماشین برو تا سوار شوی';}
+function enterSelectedCar(){const c=shopCars.find(v=>v.id===selectedCar)||{id:'starter',name:'سدان شهری اولیه',color:'#159a99'};p.carColor=c.color;p.vehicleId=c.id;p.car=true;p.inSnapPassenger=false;p.run=false;const b=buildings.find(v=>v.type==='نمایشگاه');if(b){const spawn=nearestRoadPoint(b.x+b.w/2,Math.max(35,b.y-48));p.x=spawn.x;p.y=spawn.y}p.dir=0;drive={left:false,right:false,gas:false,brake:false};driveControls.style.display='flex';joy.style.display='none';steerJoy.style.display='flex';document.getElementById('speedometer').style.display='block';document.getElementById('fuelDisplay').style.display='block';syncFuel();carSpeedKmh=0;syncSpeedometer();syncCarButton();saveGarage();}
+function openShowroom(){const opts=shopCars.map(c=>[`${c.icon} ${c.name} — ${c.price.toLocaleString('fa-IR')} سکه${ownedCars.includes(c.id)?' ✓ خریداری شده':''}`,()=>{if(ownedCars.includes(c.id)){selectedCar=c.id;enterSelectedCar();hud();close();toast('سوار '+c.name+' شدی! پدال سبز گاز را نگه دار');return}payWithZap(c.price,'خرید '+c.name,()=>{if(!ownedCars.includes(c.id))ownedCars.push(c.id);selectedCar=c.id;writeGarageSnapshot();saveGarage();enterSelectedCar();hud();close();toast(c.name+' خریداری شد و در پارکینگ ذخیره شد!')})}]);opts.push(['🅿️ پارک کردن همه ماشین‌های روی زمین در نمایشگاه',parkAllCarsAtShowroom]);opts.push(['🅿️ پارکینگ و تعویض ماشین',openGarage]);opts.push(['🗺️ برداشتن ماشین‌های پارک‌شده از روی نقشه',openMapGarage]);modal('🏢 نمایشگاه ماشین','ماشین دلخواهت را با سکه‌های کیف پول کارت زاپ بخر؛ ماشین‌های خریداری‌شده در پارکینگ ذخیره می‌شوند.\n🚗 خودروهای ویژه: لامبورگینی اونتادور ۴۰٬۰۰۰ سکه',opts)}
+function parkAllCarsAtShowroom(){
+ const parked=cars.filter(v=>v&&v.playerParked);
+ if(!parked.length){toast('هیچ ماشین پارک‌شده‌ای روی زمین نیست؛ ماشین‌های خریداری‌شده در پارکینگ نمایشگاه محفوظ‌اند.');return}
+ // هر خودرویی که در نقشه پارک شده به گاراژ نمایشگاه برمی‌گردد؛ مالکیت آن حفظ می‌شود.
+ for(const v of parked){const id=v.vehicleId||'starter';if(id==='starter'||shopCars.some(c=>c.id===id)){if(!ownedCars.includes(id))ownedCars.push(id)}}
+ cars.splice(0,cars.length,...cars.filter(v=>!v||!v.playerParked));
+ writeGarageSnapshot();saveFullGame();hud();close();
+ toast(parked.length.toLocaleString('fa-IR')+' ماشین به پارکینگ نمایشگاه برگشت و ذخیره شد 🅿️');
+}
+function openMapGarage(){const parked=cars.filter(v=>v&&v.playerParked);if(!parked.length){modal('🗺️ ماشین‌های روی نقشه','فعلاً هیچ ماشین پارک‌شده‌ای روی نقشه نداری. وقتی از ماشین پیاده شوی، ماشین همان‌جا می‌ماند و از این قسمت می‌توانی دوباره آن را برداری.',[['بازگشت به نمایشگاه',openShowroom]]);return}const list=parked.map((v,i)=>{const c=shopCars.find(x=>x.id===v.vehicleId)||{name:'سدان شهری اولیه',icon:'🚗'};return [`${c.icon} ${c.name} — برداشتن از روی نقشه`,()=>takeParkedCar(v)]});list.push(['⬅️ بازگشت به نمایشگاه',openShowroom]);modal('🗺️ ماشین‌های پارک‌شده روی نقشه','یکی از ماشین‌ها را انتخاب کن تا همان ماشین از محل پارک‌شده برداشته شود و سوارش شوی.',list)}
+function takeParkedCar(v){const i=cars.indexOf(v);if(i<0){toast('این ماشین دیگر روی نقشه نیست');openMapGarage();return}cars.splice(i,1);const c=shopCars.find(x=>x.id===v.vehicleId)||{id:'starter',name:'سدان شهری اولیه',color:v.color||'#159a99'};selectedCar=c.id;p.car=true;p.vehicleId=c.id;p.carColor=v.color||c.color;p.inSnapPassenger=false;p.run=false;p.x=v.x;p.y=v.y;p.dir=v.dir||0;carSpeedKmh=0;drive={left:false,right:false,gas:false,brake:false};driveControls.style.display='flex';joy.style.display='none';steerJoy.style.display='flex';document.getElementById('speedometer').style.display='block';document.getElementById('fuelDisplay').style.display='block';syncFuel();syncSpeedometer();syncCarButton();saveGarage();if(typeof saveFullGame==='function')saveFullGame();hud();close();toast('ماشین از روی نقشه برداشته شد؛ دوباره سوارش شدی!')}
+function openGarage(){const list=ownedCars.map(id=>{const c=shopCars.find(v=>v.id===id)||{id:'starter',name:'سدان شهری اولیه',icon:'🚗',color:'#159a99'};return [`${c.icon} ${c.name}${selectedCar===id?' • انتخاب‌شده':''} — انتخاب و سوار شو`,()=>{selectedCar=id;enterSelectedCar();close();toast('سوار '+c.name+' شدی! گاز را نگه دار تا حرکت کنی.')} ]});modal('🅿️ پارکینگ ماشین‌ها','ماشین‌های خریداری‌شده اینجا می‌مانند؛ هر زمان بخواهی می‌توانی عوضشان کنی.',list)}
+let joystick={x:0,y:0,active:false},keys={},night=true,sound=true,toastTimeout,carSpeedKmh=0,drive={left:false,right:false,gas:false,brake:false};
+const places=[
+['فروشگاه','فروشگاه',1,0],['بانک','بانک',2,0],
+['کافه','کافه',0,1],['پمپ بنزین','پمپ بنزین',1,1],['نمایشگاه ماشین','نمایشگاه',2,1],
+['سوپرمارکت','سوپرمارکت',0,2],['سینما','سینما',1,2],['فروشگاه لباس','لباس',3,2],
+['پارک مرکزی','پارک',2,3],
+['رستوران','رستوران',3,4],
+];
+const buildings=places.map((v,i)=>({name:v[0],type:v[1],x:35+v[2]*stepX,y:40+v[3]*stepY,w:300,h:220,i}));
+const cars=[]; // ماشین‌های عادی شهر حذف شده‌اند؛ فقط ماشین بازیکن و ترافیک بزرگراه باقی می‌ماند
+let snapRide=null; // تاکسی اسنپ داخل شهر
+const people=[]; // همه آدم‌های شهر حذف شده‌اند
+// ده خودروی ترافیکی مخصوص بزرگراه؛ در دو جهت رفت و برگشت حرکت می‌کنند
+const highwayCars=Array.from({length:10},(_,i)=>({x:2350+i*370,y:i%2===0?820:1120,dir:i%2===0?0:Math.PI,color:['#f3f1df','#1c91db','#c43c34','#e3b331','#1c9a84','#754ce0','#e9e9e9','#d46b34','#54a5a0','#b9c6d3'][i],speed:1.4+(i%4)*0.45,lane:i%2}));
+const coinsMap=[];
+function insideBuilding(x,y,pad=24){return buildings.some(b=>x>b.x-pad&&x<b.x+b.w+pad&&y>b.y-pad&&y<b.y+b.h+pad)}
+// خودرو فقط روی سطح آسفالت خیابان‌ها و بزرگراه حرکت می‌کند.
+function isDriveRoad(x,y){
+ const near=(v,c,t)=>Math.abs(v-c)<=t;
+ const gridX=364+393*Math.round((x-364)/393);
+ const gridY=299+328*Math.round((y-299)/328);
+ const cityVertical=gridX>=364&&gridX<=1936&&near(x,gridX,27)&&y>=-5&&y<=CH+5;
+ const cityHorizontal=gridY>=299&&gridY<=1939&&near(y,gridY,30)&&x>=-5&&x<=2295;
+ const highway= x>=2195&&x<=6205&&(near(y,857,27)||near(y,1157,27));
+ const cityRamp=near(x,2202,48)&&y>=245&&y<=1410;
+ const highwayTurn=near(x,6200,27)&&y>=857&&y<=1120;
+ return cityVertical||cityHorizontal||highway||cityRamp||highwayTurn;
+}
+for(let i=0,tries=0;i<42&&tries<5000;tries++){
+ const x=80+(i*193+tries*71)%(CW-160),y=80+(i*139+tries*47)%(CH-160);
+ if(!insideBuilding(x,y,30)){coinsMap.push({x,y,got:false});i++}
+}
+// شغل‌های عادی در فهرست گوشی؛ دسترسی بازرسی فقط از مسیر ورود کد انجام می‌شود.
+const jobs=[
+ {name:'کشاورز',icon:'🌾',pay:40,desc:'بذر بخر، گندم و موز بکار، پس از رشد برداشت کن و حقوق بگیر.'}
+];
+let savedJobName='';
+let savedPresident=false, savedObserver=false;
+try { savedJobName=localStorage.getItem('shahrAzad_activeJob')||''; savedPresident=localStorage.getItem('shahrAzad_isPresident')==='1'; savedObserver=localStorage.getItem('shahrAzad_isObserver')==='1'; } catch(e) {}
+if(savedJobName==='بازرس'){try{localStorage.removeItem('shahrAzad_activeJob');}catch(e){} savedJobName='';}
+let farmJobUnlocked=false;
+try { farmJobUnlocked=localStorage.getItem('shahrAzad_farmJobUnlocked')==='1'; } catch(e) {}
+let activeJob=jobs.find(j=>j.name===savedJobName)||null;
+// شغل کشاورزی فقط پس از پرداخت ۳۰۰ سکه قابل استفاده است.
+if(activeJob&&activeJob.name==='کشاورز'&&!farmJobUnlocked){activeJob=null;try{localStorage.removeItem('shahrAzad_activeJob');localStorage.removeItem('shahrAzad_activeJobData');}catch(e){}}
+let isPresident=savedPresident;
+let isObserver=savedObserver;
+let creatorCodes={}; // هدیه‌های ساخته‌شده در مرورگر ذخیره می‌شوند
+try { creatorCodes=JSON.parse(localStorage.getItem('shahrAzad_giftCodes')||'{}')||{}; } catch(e) { creatorCodes={}; }
+let redeemedCodes=new Set();
+try { redeemedCodes=new Set(JSON.parse(localStorage.getItem('shahrAzad_redeemedGiftCodes')||'[]')); } catch(e) { redeemedCodes=new Set(); }
+// درخت‌های شهر و بزرگراه طبق درخواست حذف شده‌اند
+const trees=[];
+function road(x,y,w,h){g.fillStyle='#465565';g.fillRect(x,y,w,h);g.strokeStyle='#d4c04e';g.lineWidth=2.5;g.setLineDash([15,16]);g.beginPath();if(w>h){g.moveTo(x,y+h/2);g.lineTo(x+w,y+h/2)}else{g.moveTo(x+w/2,y);g.lineTo(x+w/2,y+h)}g.stroke();g.setLineDash([])}
+function drawTree(t){g.fillStyle='#111b25';g.fillRect(t.x-3,t.y+7,6,13);g.fillStyle='#1f6446';g.beginPath();g.arc(t.x,t.y,12,0,7);g.fill();g.fillStyle='#3b8c50';g.beginPath();g.arc(t.x-4,t.y-4,8,0,7);g.fill();g.fillStyle='#5ba45a';g.beginPath();g.arc(t.x+3,t.y-5,5,0,7);g.fill()}
+function drawBuilding(b){
+ const x=b.x,y=b.y,w=b.w,h=b.h,t=b.type;
+ const colors={
+ 'پلیس':['#244c9b','#d9e7f5'],'فروشگاه':['#d54c43','#ffe3a0'],'بانک':['#b88b36','#f4e3a9'],'بیمارستان':['#e7edf4','#d94b52'],
+ 'کافه':['#9c4b32','#f4d3a0'],'پمپ بنزین':['#d94136','#f5f0dc'],'نمایشگاه':['#2b718d','#d7f5ff'],'مسجد':['#3c8d83','#e7e2d3'],
+ 'سوپرمارکت':['#238a61','#d9f5a3'],'سینما':['#673e86','#f1c74b'],'خانه':['#b66d4b','#f6d7b0'],'لباس':['#bf5796','#ffd9f1'],
+ 'پارک':['#45965b','#9ccfe2'],
+ 'درمانگاه':['#f1f3f5','#d94b52'],'رستوران':['#b94b35','#ffe2b1'],};
+ const c=colors[t]||['#6bab68','#dce6ee'];
+ g.fillStyle='#1b332b';g.fillRect(x-7,y+9,w+14,h+12);
+ g.fillStyle=t==='پارک'?'#45965b':c[0];g.fillRect(x,y,w,h);
+ // Main facade and roof details vary by building type
+ if(t==='پارک'){
+  g.fillStyle='#6bab68';g.fillRect(x+10,y+10,w-20,h-20);
+  for(let i=0;i<8;i++)drawTree({x:x+35+(i%4)*70,y:y+42+Math.floor(i/4)*90});
+  g.fillStyle='#9ccfe2';g.beginPath();g.arc(x+w/2,y+h/2,27,0,7);g.fill();g.fillStyle='#fff';g.font='bold 17px Tahoma';g.textAlign='center';g.fillText(b.name,x+w/2,y+h/2+5);return;
+ }
+ g.fillStyle=c[1];g.fillRect(x+22,y+20,w-44,h-38);
+ g.fillStyle=c[0];g.fillRect(x+22,y+20,w-44,24);
+ // distinctive facade motifs
+ if(t==='مسجد'){
+  g.fillStyle='#f0d48a';g.beginPath();g.arc(x+w/2,y+70,36,Math.PI,0);g.lineTo(x+w/2+36,y+100);g.lineTo(x+w/2-36,y+100);g.closePath();g.fill();
+  g.fillStyle='#3c8d83';g.fillRect(x+w/2-8,y+68,16,100);g.fillStyle='#e7e2d3';g.fillRect(x+45,y+54,12,120);g.fillRect(x+w-57,y+54,12,120);
+ } else if(t==='نمایشگاه'){
+  g.fillStyle='#bdeafa';g.fillRect(x+34,y+57,w-68,95);g.strokeStyle='#f4fbff';g.lineWidth=5;for(let i=0;i<4;i++){g.beginPath();g.moveTo(x+40+i*58,y+58);g.lineTo(x+40+i*58,y+151);g.stroke()}
+  g.fillStyle='#f6f8fa';g.fillRect(x+75,y+120,55,24);g.fillStyle='#252d37';g.fillRect(x+82,y+125,42,13);g.fillStyle='#f6f8fa';g.fillRect(x+173,y+120,55,24);g.fillStyle='#3b8cbd';g.fillRect(x+180,y+125,42,13);
+ } else if(t==='پمپ بنزین'){
+  g.fillStyle='#f4f0e4';g.fillRect(x+42,y+72,36,65);g.fillRect(x+w-78,y+72,36,65);g.fillStyle='#d94136';g.fillRect(x+48,y+82,24,18);g.fillRect(x+w-72,y+82,24,18);g.strokeStyle='#343b44';g.lineWidth=4;g.beginPath();g.moveTo(x+78,y+105);g.quadraticCurveTo(x+98,y+140,x+88,y+155);g.stroke();g.beginPath();g.moveTo(x+w-78,y+105);g.quadraticCurveTo(x+w-98,y+140,x+w-88,y+155);g.stroke();
+ } else if(t==='بانک'||t==='شهرداری'||t==='دانشگاه'||t==='کتابخانه'){
+  g.fillStyle='#f4f0dc';for(let i=0;i<4;i++){g.fillRect(x+48+i*55,y+66,14,88)}
+  g.fillStyle=c[0];g.beginPath();g.moveTo(x+28,y+68);g.lineTo(x+w/2,y+42);g.lineTo(x+w-28,y+68);g.closePath();g.fill();
+ } else if(t==='بیمارستان'||t==='درمانگاه'){
+  g.fillStyle='#fff';g.fillRect(x+w/2-7,y+52,14,42);g.fillRect(x+w/2-21,y+66,42,14);g.fillStyle='#d94b52';g.fillRect(x+w/2-4,y+55,8,36);g.fillRect(x+w/2-17,y+70,34,8);
+ } else if(t==='پلیس'){
+  g.fillStyle='#f4f7ff';g.fillRect(x+28,y+58,w-56,10);g.fillStyle='#244c9b';g.fillRect(x+28,y+76,w-56,9);g.fillStyle='#f4f7ff';g.font='bold 14px Tahoma';g.textAlign='center';g.fillText('پلیس ۱۱۰',x+w/2,y+105);
+ } else if(t==='مدرسه'){
+  for(let r=0;r<2;r++)for(let i=0;i<4;i++){g.fillStyle='#8dc9e5';g.fillRect(x+40+i*58,y+60+r*38,28,22)}g.fillStyle='#f7e3a0';g.fillRect(x+w/2-25,y+h-53,50,53);
+ } else if(['فروشگاه','بازارچه','سوپرمارکت','کافه','لباس','رستوران'].includes(t)){
+  g.fillStyle=t==='لباس'?'#db69b2':t==='کافه'?'#6c3e2b':t==='رستوران'?'#a93628':t==='سوپرمارکت'?'#238a61':'#f0d3a1';g.fillRect(x+28,y+68,w-56,20);
+  for(let i=0;i<6;i++){g.fillStyle=i%2?'#fff':'#f6c85f';g.fillRect(x+28+i*(w-56)/6,y+68,(w-56)/6,20)}
+  g.fillStyle='#bdeafa';g.fillRect(x+42,y+101,52,45);g.fillRect(x+w-94,y+101,52,45);
+ } else if(t==='سینما'){
+  g.fillStyle='#f3cb4e';g.fillRect(x+35,y+54,w-70,28);g.fillStyle='#542c6c';g.font='bold 15px Tahoma';g.textAlign='center';g.fillText('سینما • فیلم',x+w/2,y+73);for(let i=0;i<5;i++){g.fillStyle='#f3cb4e';g.fillRect(x+44+i*48,y+98,28,36)}
+ } else if(t==='خانه'){
+  g.fillStyle='#87442f';g.beginPath();g.moveTo(x+18,y+70);g.lineTo(x+w/2,y+35);g.lineTo(x+w-18,y+70);g.closePath();g.fill();g.fillStyle='#8fd1e8';g.fillRect(x+48,y+86,45,38);g.fillRect(x+w-93,y+86,45,38);
+ } else if(t==='ورزشگاه'||t==='باشگاه'){
+  g.fillStyle='#d5f0dc';for(let i=0;i<5;i++)g.fillRect(x+35+i*47,y+66,25,66);g.fillStyle='#f4f7f5';g.fillRect(x+42,y+145,w-84,10);
+ } else if(t==='ورزشگاه'){
+  g.strokeStyle='#f4f7f5';g.lineWidth=5;g.beginPath();g.ellipse(x+w/2,y+112,90,45,0,0,7);g.stroke();
+ } else if(t==='میلاد'){
+  g.fillStyle='#e8e1c8';g.fillRect(x+w/2-8,y+50,16,115);g.beginPath();g.arc(x+w/2,y+55,24,0,7);g.fill();g.fillRect(x+w/2-20,y+30,40,18);
+ } else if(t==='آزادی'){
+  g.fillStyle='#e6e3d9';g.beginPath();g.moveTo(x+w/2-40,y+158);g.lineTo(x+w/2,y+55);g.lineTo(x+w/2+40,y+158);g.closePath();g.fill();g.fillStyle='#7e9bab';g.fillRect(x+w/2-6,y+95,12,63);
+ } else {
+  for(let i=0;i<4;i++){g.fillStyle='#b9d9e8';g.fillRect(x+40+i*58,y+68,28,48)}
+ }
+ // entrance
+ g.fillStyle='#263c56';g.fillRect(x+w/2-24,y+h-43,48,43);g.fillStyle='#e8d8a2';g.fillRect(x+w/2-31,y+h-47,62,5);
+ // Clear signboard with the building's name
+ g.fillStyle='#12283a';g.fillRect(x+30,y+2,w-60,26);g.strokeStyle='#f5e5a8';g.lineWidth=1.5;g.strokeRect(x+30,y+2,w-60,26);
+ g.fillStyle='#fff';g.font='bold 16px Tahoma';g.textAlign='center';g.textBaseline='middle';g.fillText(b.name,x+w/2,y+15,w-70);g.textBaseline='alphabetic';
+}
+function drawMotorcycle(c,x=c.x,y=c.y,dir=c.dir,scale=1){
+ g.save();g.translate(x,y);g.rotate(dir);g.scale(scale,scale);
+ const color=c.color||'#d92727';
+ // دو چرخ باریک، بدنه، باک و فرمان؛ نمای بالا برای موتور
+ g.fillStyle='#111';g.beginPath();g.ellipse(-11,0,5,3.2,0,0,Math.PI*2);g.fill();
+ g.beginPath();g.ellipse(12,0,5,3.2,0,0,Math.PI*2);g.fill();
+ g.strokeStyle='#b9c4ce';g.lineWidth=2;g.beginPath();g.moveTo(-8,0);g.lineTo(-2,0);g.lineTo(5,0);g.lineTo(9,0);g.stroke();
+ g.fillStyle=color;g.beginPath();g.moveTo(-6,-4);g.lineTo(3,-5);g.lineTo(8,-2);g.lineTo(8,2);g.lineTo(2,5);g.lineTo(-6,4);g.closePath();g.fill();
+ g.fillStyle='#202733';g.fillRect(-4,-2,7,4);
+ g.strokeStyle='#dce8f0';g.lineWidth=1.5;g.beginPath();g.moveTo(10,-5);g.lineTo(14,-7);g.moveTo(10,5);g.lineTo(14,7);g.stroke();
+ g.fillStyle='#ffeaa0';g.fillRect(13,-1.5,2,3);
+ g.restore();
+}
+function drawCar(c,x=c.x,y=c.y,dir=c.dir,scale=1){g.save();g.translate(x,y);g.rotate(dir);g.scale(scale,scale);g.fillStyle='#151d2a';g.fillRect(-20,-10,40,20);g.fillStyle=c.color;g.fillRect(-18,-9,36,18);g.fillStyle='#b5d9e7';g.fillRect(-7,-7,15,14);g.fillStyle='#f8edb1';g.fillRect(14,-6,4,4);g.fillRect(14,3,4,4);g.fillStyle='#111';g.fillRect(-12,-12,8,3);g.fillRect(5,-12,8,3);g.fillRect(-12,9,8,3);g.fillRect(5,9,8,3);g.restore()}
+const customSkinFaces={nariman:new Image(),amirabbas:new Image()};
+customSkinFaces.nariman.src='data:image/jpeg;base64,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';
+customSkinFaces.amirabbas.src='data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAQDAwMDAgQDAwMEBAQFBgoGBgUFBgwICQcKDgwPDg4MDQ0PERYTDxAVEQ0NExoTFRcYGRkZDxIbHRsYHRYYGRj/2wBDAQQEBAYFBgsGBgsYEA0QGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBgYGBj/wAARCAEAAQADASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD20Rnrg08IR61Kl+rYLQwv7gY/lUy3Vm/3omT/AHWB/nXNY6iuFwQaeBzVpfsTji4K/wC8v+FSLaK3+rmhf2D/AONVYVysoqVamNjOvPlMR7c03ynU4KmiwXGgHOQAadvCj5gfyzUF1dQ2MBmuH2KB3ryvxf8AHDTtClktbEeZcIOVI5/WncL9T1v7RFyu9T7UG4EIDgBgecKcn8q+T9V+POvX11uspBbKP+WRUMD7k1Sg8dapqt1IZdcuY3mADIjbQp/2fT86LMSaPrpdd05pPKaUq/oR/XtWfqPivTrC4+zSyjc3APVfxIr5zRvFNxAZV8TXAYDCl3DKR/vYyKZLr/iXTbZpLkvdKnXbHvH1O08/XFUirHpnizUYdYgc+cJ7baRlCOPbjkivIte/4R59KeLy8SEHYw5w3bNSW/juC8tmC6dCZv4/JcBlx6A81yWq6tp9wHFtFPCjHJE3JyeozQHQw7LVbvTbx9k7pz8yq3Br0HSfGmIxBNOs0bDIWdB1PbcK8v1IxrOsy7VDDkipLSVY13+cj9CAG/WqaMlJpnr154j0t4447hQpfgqTuX9eRUUI08Tfb9PuIpyOUgdh1+h5rgoPE8kMmZoLe5QDbtkXleODkd6uxeIo5F/dQR7z1V1zz7UJFcyNi+1y8u9QFzfo3nk8yEnCgdh6AUv9t3gZUhncgnAGTtPpWG1/9okxcZh55Z0Ix+NZk0WorMz2F0sjdgnOR7CnYL2PWLLV9ZsIEa4dEJXoTvX68Uuo66l1bRlrh1Yd1YjmvIbPXNVs7lwby6hkHBRuf51sp4mkYhnlkEoPz71AH19KnlY1NM7OLxbrsR3rc+fEnBic7uPqOQa6jQPindTFLO+ilwjho5HfcAQfu5PODXkU92iuslvcRBm6+SR/nNVZJ5xOGklZgB8uDgf/AK6dhOSPrjSPGVpqWjzyK22eJtuzIGQc4I/Kuz0bUIrn9yrgugBIHavjHS/GMthKpRSx6HcxP5V9I/DfxBa6hbiVZt8zx75Nx5BJ4X6AZqWGj2PVxhuRzRgUyF90Se4yalNAhuKTbUmOKTAoAj20hWpMcUhFAHKvYWmduAn1UrTf7NUj93L+AfP6GsyO5vI+I7iVfYMatJqN2DhvKf8A34x/MYrJSRryssHTblDlWYj3TP8AKjyLhTjarfQ0sWqMOWtVB9Y5CtW01aNsBxOo9CA9VdCsysj3MRBAmjx6Zqb+2LqGM7pGcejgf1q0t7Zv1aDPuDGaxPFms6fpnh25vLghIoo2kd0cPhVGTx600I8c+M/xdGmh9F0+IrelctIjDCD/AB9q+Xr29nvJ2uJnmkcnlickn1q94j1uTW/EN1fmM5nkL7Sc4HYfyrI2OylWB+laRVjCUm2Ri4YPjceD1Fa1hrMtu3E4OOcMM1mLavJxGoJ9iKs/2bcRRiSRUAJ4yQf5VZNz0DR/HIjwklwIzgA7j29q6ZfEkN7GP7M1C1+0Djy2bysn23cfka8djhhx8zqTn+7nFWY9P8xv3MqYPq22psWqjPQtRmaCcrregId/R2UxsPowGD9a57UrfTSpktTdW+f4ZGDAfQijT49btrJngv5UC8KDN5i5/EcUty1/dFprzaSBhvLUKGP0FKxfNdHN3KSNEQ04fGcd6pws5KplR6E8Veu4fJnIeJkPdT1rOw3mHkEduK0MmzWsY7eWZBNNxn5gK7CwXR7ZQ6RCR1PGxhn/ABrgoTEAFMpRh2xkVct71rbDwTNv7nHH5UgTOy1HWLFpNlvEWYjnOWBNYd9NFEyyh4oXPIMb8/jjpWdPqt/cndJIpbtuXA/Kqkkk0iDzSpU9SeAPpVWByNA6pLNITcOJzjq5AP51GWiMjPHcSqp6q/IX8az22xwbFhDE/wDLUn+QoVgITyD9P60cpPMXjb3EMu5pomjPIIbn/wDVWja3PmukLsNpGNx7VQSaJ7YKZACoztqsbkIMDj0xSaHzGt9242g5we3869Q8AeLjo90soYHZjAP68149buSTKMnnnNb2kXV1DdKFVsdRxmoki4S1PuLQfFulX+ktfrPhFwMN95fqPxrTXWoJL6G3RhvlG8AHkL618eQ+LdTs7Q21veyQb8ZVO4969k+F+tXN5frqOo3PnTSrtwx4x/ntUGtj3UOGQN0J7HvT9v0zVaGVWjDk4yOM9TVlH3HAXAoJDFJtyKfig0AcB5J65FOERq0I8DinCPisLHQVfLJHTijYB1q0Yvl6k1WvHitrYyTP5Yxxxkn6CmBQ1HU7LTbVpri5SMKCfmbH6185fFn4lSa1bPoum3AjtGO2ZlGDLz0z3HT6034q/EEahdyabaS+YqsQ5B4X/ZGK8Zvr4yFstnPc9auCvqY1ZrYi85YiQsZJ/vH1qFrkgksuc9agkmySd5z6YqMydyB9a6EjnLwutoGMD6DFK11K6nD5AGDms3cd338enFCzhXG47uPXFOwrl0M+4Eso/rU8WoTwMNkvI67elZhuE6rnGe/NKs6jqVx78YosK501rrcjZV5CE/iBORVyO/ikceZIw75xXJR3KIdzAY9qsQ6jEmTtwOuAcUWKUjoLq5UQNhVOehNYTkvIeMHNPmvllwRJjHTNVDOpkzuIPpQD1LsanoFUnt3qwILplILGNccAjFZguHHzBcjpUwupGULvk47ZyKdiSZ45VyDIW9Du4qLfInAOP9rHWoGuzvAILeppyyMW3nhc0wJp5pJHHmMzYAAz2qu8+1toYfhV+5tikStnlvujHJrFkR1lPB6/lTQmWYruVXIVm5PrS/aGL4JzVJi+7AJqRVkLZA59qZKNyzLHLdRitCG4EUm5eSfQ1iQkrEuGAPtWrpxgdHaYM2M4PYH3qGjROxtW1yYZUnuVZzjcFJ7dq9G8G+KLPzmiZmt3OChZvlfHb2NeVussmEUhvTmr1hqFjZsguWy2fvqN2wVCjqXzn1joXibUkMcccJdAoLTSPnYp6HGa9I0vXLe6RQL2F3x93cMk18r+GvHWmvbKrXsyNGpVXlGCyj/PSvQ/C3jXTJdRaNYnlXqHP8RHoD/KnKPYake/rJuXOAtOyDXNaLryX1mkpnHzdFdNua34plkXPT6nOayLOdEXFO8vFEd5YzKGiuYypbZuzgZ9KtNGQcYrKxvcyNTv7bS7Nrm+mWCIcbm7n0FeJfET4mxPp8ljom95nBBuOQsY7gE967jxlDPfeLYoJAZLaPahjJxhic7149CK8t+LR0rwt4ZmMZD390rIoYjCr6hR04z7mm1oN6I+e9Zu2M7AuO/PcnNYSzM7EDI5q1IxuD57SFs9s1EzdQBwPato6HFLUj3MDkkD070ZUr94/lSFs9vxqPJyAWxzVEjm56c/jULBW6nJHpUhBBHJpNrfw4FVcLEQAz92n454A59KcFJJ/rTwBnhT9BRcOUjxI44yc+lSLG2AGc1IqsRtHHtipBC23GRijmHysYFC4AfNBI4wckVN5AU9z+FIYsnGPxNK5XKyLPzkClUuOMNipAg3ZIxz2p64ydqfiaaZPKNjWRjkA/Q1bijdiq46fpTBGWOGf8quWoWEhlUn60XDlLeD9nB5OFxWc1k7kthVH51qfaJZUAIGOhGMU4AnHyqB04HWp57FqncykssMSwOPrzU8EEaMSV4H61eEDE4K5+tP+znHAxS9oP2RlSoZiTFE4HtVuykktoXjfKhuq9zVkwS7du5gPSoBannjPbNNTE6bNiJUkgUR7TKRwytwR6EVn3emO0pkiwnYqQcE+oqJYZERSD9D6VaWS6lAjaSTjuSaakS4iWsN3bYMinHYf1r0Lwhryw3NuryhSX2KDgc+9cE8VzjMs+wAegatHRYTFdR3xljby2yoYEHIPXkYNVcWx9U+GNSi84rKZbeWJ8rKrggt6c16hp11JcLvfYAOf96vmbSdeEdgsnmqflAfgkZ9T6V3+heJb2wljN8zm3kGUVucemD6VMolqR3Mml3t1p9jdalqkC+SxjLeSPlAyCrEHkNj6e3epU1m5fT2NsN8X3YDt5b3HtXHWt/PDp4g1bVFXS95kLqxJm7gfQ96vT+K7N9PuZLCWHBj8qPB5TnsO3/1q5bnS7lG+vtS1CN5blbcTRAh5UXaHwTtX64Pbrivm/4w3CNrv2SYrJc/flAOdvoM+le2+IPEdrpGkwwedIdrCU7R99uvU+lfNPiK7a61e8vJWaSWV2kLsPU5pxFNs5B1ZRkqAD+lUn3M3zEEegFWZptuSzkkjoDVJ52ycZrdHOxSh37ienSjCjg8/jUBkZzkt+tPRWPAB6+tWzNEhOcbc5qRbdnPqKngtiSCRjPY1p21oSc8e4rNysbQhcz0tVIGKmWz5GQMYrahsSMbh75q9Dp6jB8vJPtWTqWOiNFswY7H5eFwPfvUy6eemwc966RbEL1XDHvmnfYx6ZqPamqw5zB05mwFHemtp5BG4HnqetdSbLvgn36Uw2QPb9KFVH9XOVaxO3KqaRLF8cR4+orp2ssNnHTpSCzOfu8nrmqVUh4cxEtNq5OSfpU62gz90/QGtcWgGCP0FTLbAt93HHTFL2o1QMpLMg5I49qsxWuTjFaa2ygg7c+9XILQmTJGB/OolUNoUDPis124Kn8eM1OtgrMBs5HStyGwZkBCHFaFvpLmPdnjuDWTqmyoI5R9M43bf0qH+ziFICk+vFd4dLJ+UDIHPSoH00I/zIx98YpqqKWHR55PaPGp3xhc9c1WeJtoDtgDpXe3ulrMCqqR+Fczd6XNExVxgZxmuiFS5x1aDiYwBMm3hl7D1rqdPv4TcwS6kAtpBjdEMY4Fc40bwDOVB9RVWZiwSJVY5O52J61vBnHNWOmv9Y1C81XbFeeVC7bztGFAFeh+E/H0t1ZW2n6hFE4gk25jXgfVew+leVwO/wDYgaRVdVY4OOvt+FWNLuvs2JEIEpb5hnANa7mK0PpXXI0vbpbCwt/3UQ8vEZAUkdhXLx20zyypLa6lFGh2gLHvx9cHgV3Ftp8jSKluNu9THAp7ermulttPt9OtYbCAAkthnIyWJ6muFs74s+c/GN3PY2kltbWmpFiMF5YdoOep3GvGNRlJaQtyD719gfHKc2fw+eCJdzTHYxUfdQDJ+nSvjPUWJD9+TxmrijObuY1zIZD1BHb1FVCTznp61PIoAGB2quTk/LjGea3ic8h8MW9sKp561sW1kCB/nNRaZaiRhlSAcc5rp7ez2sMLkD0qZzsa0qdyrb2ZHYVqwWgLgEDn2q1FakgKRzWhBbt93iuWVQ9GlRsVrezAGSM+xq4kAxnBzjrircVtgcj6Y5q1HZknnOK53M7I07FDyARwOPepEtgzbcVqJYllyTxnmrMWnFOcEelZuZp7MxGtPbimG2HTbW+1kd3INAsSP4aPaFKmc8bTHbH0pn2TD8D8MV0ZsjjIAHtSfYcDhfzFCqA6Rz32XPp+NTx6fkYA59h1rorTSjPLjaQO+BWkmmRxrkDLHouKaqE+yOTGntH94EEdqtQWmSEC454JroLjTB5R/ve1Rw2ZSVSQDg0nO5SgTW9kY4gNmR9OtaKxOIAjKB6Cr1nZM4Tavyg96uy2TDH86V7kvczrezBAJUYHX2qY6ckq4IGDWh9mKAgE4I6Yp8aYwD+tFwsZR0aJsMoANY+s+GZJoGeJVPrjrXbIAcHA9KdLEGjIA4qlJrYlxT0Z4HqekmEN8oKjrxWDPbMsuVHAGcHvXrvijQ2AM6ABCecCvOtStfKuCSWJxmu6jUueXiaNtjPhczWfkMxUBtwI7GnpieRVfYkuevQN7n3qrl4ySuAfSnxTAzgOckHPI4P/ANeutM89o+3oraO13XT/AOsIwvH3V9BUenh7rXUkb7sY3Efyp1w7yyeWoJyav6fb/ZkZ/wCJq4t2db2OD+MmnXGqeEpbGy2mWYfN6hVG44/Kvii+BNxIp6hs8V99anBBepf3F1Gs0ckLQIpH8OCGI9yf5V8La80AvJ0gAJSRkPpwcda0iZS0OTmUBtoXGKZDAXn2Ljn1qy0bSS4bt3HetfRNNabU0BTcO/tW3NZXM1HmdjT0vT9kEX8XGTiuggssZbBB69OavWWmhBz2HcVpRWfI+XH4Vw1Kh61GjZFG3tBgED/69XYLUk4C5H61oQ2Jcgds8e9atpYIuCQPpXLKZ3QgjOttOyQeg+lakGnhSMKcDrxWlDaJxt6GrccIAwBgVk5M2SSM+OwU44471IbQAdBWiqAKMmjYDziodyzL+wjrjNL9iB7A1qeWtAjGOlCbAyvsIz92npYAkALmtPy+c1IkRPOMZpgZ6WgjG1MirEVo7ONgI7VpR28ezc33hUiKFGTzTM2zMntfKTaV59qpi3OckCtO6mUyEY6d6p+alNjN/RY1Ntk5JA6mr80I3ADBwax9Ju0UEdhW1DLG8hJIP41pHYyluRtbq2BjmmPaHGelaCeVjkgmpRCrLwRzVWJuYyqynGCPrUmDjGKvvBjJxUDJhen4Uh3uZGpQLJaspUEY6V5J4nswoP7vBB4I617TPEHXFefeMdN/0dmRRtHOa2pSszmxEOaJ5JzkggURqpk2tkZ7g4walu4/JlLcgMewqsV+fqcenrXpRZ4klY+7LaJSwJHPerdycWzDOMjApluuAzkYpkrma6CAZA/nXLHQ6jJ1m5g03wtfahNGzW1pbu7KnVgFPFfAcr/ab2VxyCxJGeRnmvtD45a3/Yvwgv7SHHm3KiHnsGPP48H9a+MYQux+FUk56dq0iZT3K4hG85Ude1dt4N07zbln28fd+tcpEv70HIHNes+DdOCWKOSGJ7gVNaVomuGhedzTTTwkeCMn2FWEscdBWldPa2Fibi4cKg/P6VzN14z0+JWEfzEdK89KUtkerzxjuzeWBE6jNWEdIxwSBj1rzm/+IYRB5KEHqc4rnrn4h6nLyuxR04FarDzkS8ZTj1ue2i5iUcMMCnfbIscSDn0rwA+NNZdsNePzTE8SamzgtdS8HPDGq+pvqyFmEOx7/JfwR/M75HoKkS9iKg7+DXiun+JdRB+e5Min+Fjn9a6XTtcd5FTJO7kLms5YZxOinjIzPSRcIeN4HpmphIpAIcH8a4+K+fzMbuv8q2Ibr5VJfr7Vg4WOhO5uow3ZJ/OpDOAMcVkpdZUHOT0qOWd8lgxA9qmw7Gs9/HEhLOOKy73xTY2sDEzYIHp1rntSuJw27PBHFcZqctzJOWO4n19K3p01LcxqycNjotQ+IKpM4gjL+5rnbnx/qbgpDGijPTvXPTxSM3I25PAPNRLaSFuEOPYc12RowXQ82rXqvZm0njzxArErchVP8GK1rX4lazEyM9wyKnVMfK1cqlhIyf6plxUb6fMpzsY474rRRh2MHKo9bs9O0/4vNJcbLyMwL2ZBu/Q109v8SrfaGWVJwe614K1hcbSxif8AI0+Dz4HXGMA8gZp+zgxKvUWjPprT/HemXO1bhvKyPvEjGK6JHguYRLC6urDIZeQa+Z9P1SXyfIlCOM5BHDCuy8M+K9T0u4VUmae3Y4aKXPyj1FYTorodVPEN/Eewuh6ACuc8Q2XnWcijrg4zWzpmtWOrRfupAsoHzRN1H+Ip99brPAwwCcYrDlszp5k0fOWpoyyTLtO9Scfn2rKU5Gckmuy8V6ebXWZDt4Y8Z71yZTG8gYAPNejTd0eNXjys+7ppBBBgYz7etRxMlvbNczHAUZ5qszfabwRc7EOWPv6VQ166yiwq+1E5f644HFYN2N0r6HiH7QeszS6faWEjYErtOwB7KMKPwzXzqjbbcZ+8a9h+O1zG82leQ83lsrqBIc5w3X+leQEbgDjgVdPYyq/ESW5/fx5AJJ5Fe4aLJa6P4SS6uvkUJuOF614hpWbvxBb2wAy8gBrvte1Sa6ZLNGxbW42rg4B9T+lRWjzNI2wz5bsz/EviK41W+bB2wqflXPauOvb6RsJHuyD3rU+yNcycBzk8Y4rStvD+VDtDk9cMcU04wVgcJ1GcRHBd3BI2nBPpVuHR71usTY9SOK9Dt9FjjiAES59h1qz/AGdtHCcewqfrC6GscE3uzz1NEuATvUhjUiaLMjZI7cd//wBVdtNahB90iqRUhtpFCrtl/VEjBi0+SBcYP1rW06JluE6jByDVjp2x9BmrFr5fmAEnJ6YFJyuXGiovQ6WyVXi4wSPWte2iYoFAzVLTIRIRj8cV0ltZEgbN2PY1xzdj0IbEUVviIZ4OelOeL5Tk1ppYOV61FLbFFO7isblpnN6hahgoTr6+lYU2lRg5Y59Sa6u7KKGJOCK5+5uVaUhOla05MmauZT6VbD+H86abK3UEBAKsySqT1/OoDIu4qT1ra7MeRdhUt4QcBRxV1LaHC5UexAqK2RZHAOK3bTTmuCFhQknvSbY1FIyzYRSjDR7gOxHNVpPDlnOSUgVT3wK7KPw/cg5ZCAamGizIOVBx+dLmaBwi9zz4+GGj5jKke+OKlj0i5TaMfL6g5rvVsDGMFD75pwskPPlL9KpVpGTw8FsYWlzTQSKSTHKB8siHqRXpemXiajYLMPvYww9DXIHTomGCuw5yCBW/4fR7aQxHlW5zVKXMQ48uxyXxI0cJAL1F6nnA6V5ITtdkJr6V8UaYNT8OXFuB8zKSuPWvm6+iaC7ZHXYVYqyn1rooS6HBjI7M+2tyWlqXbkjk+rGuYe6jvdcTTrqORJ3BZGVc59avarfKzsmJTHH1MYyS2Pb0qPw7aSLLLqd1JIwYBY/NG1gvU596zkyoK2rPFf2jLGzs7bRYIbcCT5yZCR07D88n8a8Bl/dWztngDPFeyftEaoLzx9bQK6FIIAoGckZyTnt6fnXiuoSAWTRAnp1remvdOar8TNDwJbveeLyw5MaNIPyrt10xp5CznCg55rG+DVh9q13UrplO2O3VfqSf/rV6Nd2Zt1OY/mJNYVpWnY7MLTvC7OdTT4YwoXOfftWpa6YPvBePepbO3826VSOh5HoK2HX+FVG0cVhKVz0IRSKQso0TacE+1I9ou3G2rTSRRZLsufSqdxqNuiEvIox6nGKyNrmZe24AO1OVrDmVlclwBz+VX77xDpigg3kH/fYrCudZsJmOydG+hyDW1OLMalSK6khcgnvUbuyOGQ49hVRbyFmwko+hNXI4mlU4KsuOoNbWsZKaZ2/hmTz40OCSeDXpOm2uSsYG71rz3wRZyeUrYwc8Z5r1rTLXZtGcnvXDVd2dkVoLNZLHCGCn8a5/UI9oYdfauv1BT9lHlk/KOlcxOokVw4IJ9aznsEDz3Xbh41YZ6+lcx5zMNxDDuBXT+LLSSJySPlIwDXMKF8jOAMDk5rSlsKo9SCW5Ckg4471FHcbiOMD1rPvdQtEnKKxck445qmL+QtlI8/U12Rjoc0qljudLiMsozjYOpz2r0DSY7ZYQFlT868CbxXd2Urxoi7sDHcVoWnxA1ONN5MKhcA4X174zVKhJvQxeMgtGfRXkqE3K6n/dNRFnU9MivErX4k6gNSMEUizRlsI4ym4fQ9DXT2HxIhkZVvUMOTgk8gfjUzozQ6eLpy0uelCOKdMMvzVSkg8tyAOKq6Vr9jegGCdH/wB081p3RRk3DmseXudDmuhBGoyBwfrV6yQLcgjjtWbC2HBXNatsWOMZ/A0LQl6mwUEkGCOor5/+I+kDTfFUsioBFcfvOnGe9fQUPzRjNebfFrSfP0VLxFGYWyfoeP8ACtqMrSOfEQ5oM9Plgku8aczRrHJkb+S7N378V0ws1TSmt1LBQmzKjBHHrWToGkqNRn1CaOTzHOxPN6gew7dfxxXR2cMlxdXEa3B8lTtyAM57ge1N6mFz4x+NFrLbfEuYmUyKUXbng7QOMfrXl92xktDyen417f8AtD6Wtp8RiqMxXyAxBBIXJOBn8j9TXhyJmExtnIJ4NdVP4UcVX4mew/AuwK+HNSvWUYklCA9ScD/69d1qkeImwO+eaxfhDbCD4bB15Ek7knHpgVv6mu9GJwFHXJrzq8/fZ62Ej7iMbTkRJ2d8LxXN+I/F9vp80kEUwZ1B+ROtV/EOsSCN7OyhllbkM0fQfjXnt5p+oljIYdozkgnJrSlTUtZDr1nDSJJqXizVL2VjbyOoxyEOcVzc97eXM+65uZj65Y8+1bUM11CpiFtHt6fdqlLpjXMzYjKbjzXZFRjsebUc57sypHhdv3cewHtu3fqa6XQ4LOPTS90GLucKgOahg0a3iIL4Yd61YEjgXbCgGaJSCFJp3GtYyTZ2RiFf7561uaLYtJNHaQkuc4Zu1Z8QnnkCLuLHsK9N8FaCI1WQpluD071y1p2iejQptyOy8O6YkEESBMBRjNd/YQKqisTTLUxKAQK6axiz9K889HoPmhUqflwMVgXtkhZtnGa6eaL5OGrMmgJUkDNU0TE8913SpbmzeKQAg9DjpXl2pWFzp9w8UqnaOh9RXvN5EGQqyZ/CuJ13SY5yQ6/Lzggc1MZcrsVKPMjyG50+xnydjROecr0qosE1tMWieOTj+IV1Op6NdWk3+rPlnkEjtWHJbOJDlMd/pXfCd0cU4M5zWLF7iVZ4oQj9CvasZre7TkwsMd8ZrtvLkAO5Qw7cZpos0kKiRQFHXb3rojUscc8PzO6Oe0iOCS6H2zeoz8zbeTW/dPpMUWLJ5SwHRhx9atQ6VZmfdj5fStW30qyUg+T7805VVuTDDNHO2DTJcefG9zDj+OHPFd5ofiHUAwguZJZVB4ZjnNJp8MEDYSMANwABXZaRo8DQqTbIc8ngVjOqmrWNqdBwd7lmxd52UhDg8mujtYSFHBzT7DTIlUAIB9O1bEVkEHT6GuaTOtIjtwVAzWX4t07+0PDV1BtBLIcZrfEBXtn6U28i32bqR1U0QepMlc6qzhIiWIZVQME9zWvaWSJcGSFNpxg46GuesJNQ1DVUMKvHbKcM2ML0HTjk5/Cu3t4RHEBg/ietdSOA8E+O/gMazpU+qwoVu4VBibk+aSQGX/D6V8jLpdwuZHjdVkZgC3cg4OK+2/ir4302yum0REgnuI4yCZXIRGOOOOp4FfJ2q6jfzLcWM0FvHElxLOqxJt+Zznn14OBWkKi2RFWhJrntoev+Abb7P8M9NRVA3RlsDvknk1rXNms0RVk4PtUHg6PZ4B0pM5/0dTn681tvGCpGK82r8TPSo6RRw2qaVALZljhVR32jH41xWpWBywTK++K9bubUOCSq/jWFe6Yr5JXGeOBUwqcrNnTU0eRzadJkbYzwfSqr2EucYCjue9ekXGmAEgR9T1NUn0xVGdhY9M7a6I17mbwqOGGnynqp/GrUGlOx5Uj0BFdfHpZdwqx9fxrXstDVHDuoZvp0pSxFilhkYeieH/LIkki+Zume1eteH9PS2skZl+Y9z6Vz9tapDMhxwDzW/HfbFGDxXM582psocuiOmh2L3rYsLyJJACma4Qauc4BzVu31Vj0cg+goRfLfQ9CnuLExly20Y5BrOkkgfmN1YdiDXNNqjOu0tkd6ct8EGFCqPQdKtyuJU7F+8iDrkfhWJLbpKSGAP4VorfK0eGNVZSud68Cs2MwNT0dJrBo9gJ65rir/AMPAq3lR4wOfevVV2OMH9azr3SUdzLEMHuo704trYT13PHZNLCkjgY9RUR00exx3FepXHhqO9QuoKSD26msSfwxdxnciA8/St1UMnBHFrYsOnP4VbhsZWOAOM11tt4bnYHzEJwM4Het600JHRV8oI2OPrT9pcXLYyNC8KgkSTn5jyvcV3NhpKwJt2YPajSrR4PlkGAO1bygKgz9aTkS0RW9sFOcY9quiIYB61GjDPBIqwjDd9akViMxjHaq90v7ls56Vf2gjPFVbsDyGB9KqKIbO60yFCg8vGwdMVqk7RkkHFR2sKxwqo4GOgqG8lIUIpOSQPWu1I88+NPGV1NfeNNQmlYszTMefdq4XUrdgkjsDzwa7nxlazWPjW+gmBVhM6kH1DGua1C38yzcZ7ZrjhLlmfQVaPPQXkj1vwS4k8A6U3PECjn24/pW27DoK5j4bzmb4b2Qbloi8Rz7Mf6EV0UjdgQaitpI4KOqQOu4YqnJbbmPPFWQcinKAeK5pHVEypNODe/HpUX9kxkklQT/Kt3auORQUHpU6osxl05V5VAPpTxbrEuTxitQqORj8apXTEKVUZpFJFJSrKWBqr9tG9kJ5BpjXHls8Z69QK4TxZe3cSb7W6aJs5DIcEVtShdilorneG6GSQ2DUsd9t+63615f4e8VancSm3v4w4QYE3Qn6110F7uTJYEV0Ony6EQmpao62G+w33vzq/HqCmP5iAMda49bsLCzqwDAcE1wHjC31+eMXVvqdywB+aONyBj2AqFC7tcqcmo3Sue3R3aSyqEkzmthWHkYyDxXiHgXWtRVEiunaRgcZbrXrC34W33u4HGetTKPI7BD3o8yNHzgHBBxWhC6OoHc1iWubhdyHPfitOEmJvmHNShM1I44gMBOT3xUMtghRlXPXIFSwSlhjkmrQK7ssK0RLRnw2YXbkAdvpVpLREfP5GrQK5xjinswxgUITK4QI25R1qTeT1NKcen40x+FyKYrDgxDdalSQFgM81VLdqVG+ap6ktGvCpYeopl9Di2Y9OKl08GQitCa3WWLYw4Pat4rQ45zsztJcxR7TgE81DpkP27XolbOyP52I9un61DeTku5JrY8MW4jgNwy5dzxntXYca1Z80/tA+D30z4i3OowxYt79RdxkDjJ4cfgwP5ivIreBbl0t2wpJAI9a+5/i34b0jXPhqyakDHcxvutJ0GWjY8EY7qeAR9O4r4+v/Dl1oniBY7qEqwO5WAO11PAZT3HvXFiKfJK6Pey7FxqU+SW6NXwXbx6fp15YRvlEm8xB6Bh/iK23YhyRnFc34ddofEc9u2NskZxzzkc10jj950/GsX7yuzGUOSVkKpzUwGOOKgyemKlViQO9Z2NIkmQBnP500tkc0rNuXBwKZgAZBqWjRCMeDg4quYi2WYnFTYLuOKbcgRwHPGazKOV1pGKMYwQ44BrgNTgvLiYeYhZR79a9QuY45lO5ePWsmWwgDkheTzW1OdhSV1Y5K301UgQRptBHQCp1gki4Vjj3roPsag8DioJoPy+la+0uSo22MnZKzfMxxVyGJmULjIqQRY6CrUCcBcHmk3ctIwbmyurO/eazQLu+bj1rd8O2mta3qSxzzv5a8njgCti10hrqQR7OPU12mjWUNhAQqKGPUgUc3Qhu2xastMW1gVF7DGamaAA8CrCuG6ge2KeQuOtUZ6laLCHvVhW544qNlOOKQNjjFTcpFpZBnrzUgkB4PWqW8YwM5pRJ05ouOxc3AHnNIWz61DvPFG75etMmwMTQpJbNMY06HmTBpkSOl0hDgelahQmcAdBVTSIwIwSCavAk3PBroijzJu7LjlprpYlJOTzXd6JCMLCBnHXFcdo0HnXLPgkjp7V6JolssVu07kZPf0rpSuzG/LFs4X4sXjvLYaRBlnIL7QMjJIC54PcjqO3tXDeONBg1r7NoFvbl7qytc28qABUI7N3w3T68102qyLqvxPm1Ezo0VqxY/MGKKi8DGMj5mz17CqcCWWoOuqGYTxs3nRzJJlR9MHHA7H8acoqW4qcnTSa3PnK5glsfENrdCNhiQB1xzzwRXSSDD9ea3PFOmyrqyaoLfFvelnDDorjlh7dQcHkHNY0w6NnqK85w5XY9ZVPaRUiAt04NKr471E2d3/16YXx1OTWcjWBYLj15oVi3yg1V3/PmnrMAM54qGrmyNKIBfvc5qlqM6lwg5+lRSX8caZL1h3Oqb5XBxj1qXF7IE9SxI7B2IbI9PSoSyt249apm9Lrw2RQsjORgE+lNQsO5YZee3Paq8mDip/KlYfdIFQPDKDgjgVVikiELzyBWrpdosj72XIX171WtNNvLyYJDCxHdscV1Vno81tbgMORxTSbBj4SsYG0DNWo7nAxuqu8DovIzVVpAgORg0NWM7G3Hd4O0N71biu/0rk2vVQ5D4pF1cJja4H40JiaOuM+W69aaZBWBDqfmYBcA+1XI7xGwAeaoRoGUgetKsp+lUxLk84/ClEh9akovrLkYz0p+9s8mqKSEtU6P2PeqQmT7j0zirFqC0vTIyORVU+gNamlR5kBbpVx3Oao7K51ViAlsPpViHaWZyelUonUcCm6leCx0WecsN2MD610bHmtXZ3Xh+2CRKxH3unvXRa3qKaP4RvLo4AjjOAeMk8AfjVDSYR5aBQMKMZrO+JFyIvDdvYoxLSzB227s4UFv4eeuK6o6GcuiOBtINUk8I3d7DdyLeagxEDo2FQBidw5OAWz07YqxLaiPTLi4EFnFNdERO1uAS2c7sk43HG7jFW9Rjae4tdJttSW2lgtl+RVSR26Akhv4ememfWnrB5uq2VmpGyJd7BE2IfXA6EcdDyNwNBL3ML4gKth4IsrYhd2/HGSAcc4zzXl7FZbNWBzxjNe4+LvC9z4q0D7FYyIl2jGSLecK2ByCe2fWvHbzwxrvh218nWbCW2LOdm/BDD2IrlrRbldbHfh5xULX1MUkAHOarSSZQYXHPNSTsVBB7HpVGR+Cf5muWSO2myVpgo4bFULvUdgbaenf0pl1MFj46/rWDezSl2DH5SeMCojG5uxbrVpXAKsffFUFumeUjPNUruXYuCckdMVkJrAtm3NIM+9dMIXOec7HbW7xxR755MAds02TXreHIhP5VwN14jkn+UHORkjNMjuLyXBSJyD7YFV7Hqxwqp7Hd/8ACVSjA6gVas/F0SXKm5iDL+dcGBfZG6Fjnv6UrG5Vci3ko9lE6YyZ68PiBawW4SCH6cYqo/xDu3kIjhjC+5ry5JbjAHkyfSrCyXbkCOFiT29aPZo0Vux6hbeOdy/6TEp91NaUetadfoSkgBPY8GvK47XWtn/HnJjsNhFMmOq2g3tbyoR3PFS6aZMkuh6RfLiNmjYZPbNYJvmQlS2NvrXJf8JVfRfLIGZcc1n3PiZ7mVTGp5701RZyzqpHolpqRWQYbj0zW/bXocKwyBXmml3skiqzH/61dZp9y2Rhjt9xUSjYIu+p29vPvUAnn1qdZM+nHGax7N/kHOD6VoqxBGPxrFo1RfSTkDIzVlXLGs6Nxuz+lWoW4HvTRMjRi+bGOQa3dPOxPesC3Hzit2z7cYxW0EcdZ6GzB83I71zHj+8lt9Ot7dNwDPkkV2Onw+Y3TFc/8RLO7tLbT7m2sjdxHzBPF14GCD6g8nkVq1dWOOEkppn/2Q==';
+const skinCatalog=[
+{id:'ronaldo',name:'رونالدو',price:10000,shirt:'#ffdf00',pants:'#fff7d1',hair:'#30241c',num:'7',numColor:'#111111',style:'jersey',kit:'solid'},
+{id:'messi',name:'مسی',price:5000,shirt:'#ffffff',pants:'#78c9f2',hair:'#765238',num:'10',numColor:'#111111',style:'jersey',kit:'sky-stripes'},
+{id:'shelby',name:'توماس شلبی',price:3000,shirt:'#34333a',pants:'#25252b',hair:'#4c392c',num:'',style:'suit'},
+{id:'mbappe',name:'کیلیان امباپه',price:6000,shirt:'#183b94',pants:'#151b36',hair:'#191919',num:'10',style:'jersey'},
+{id:'ashraf',name:'اشرف رویا',price:4000,shirt:'#e7e4db',pants:'#243342',hair:'#211914',num:'',style:'casual'},
+{id:'technoblade',name:'تکنوبلید',price:null,shirt:'#b51f32',pants:'#b9b9b9',hair:'#e8dfd1',num:'',style:'pig'},
+{id:'ghost',name:'گوست',price:7000,shirt:'#4b515b',pants:'#292e36',hair:'#ecebe4',num:'',style:'mask'},
+{id:'frontman',name:'فرانت‌من',price:5500000,shirt:'#25252a',pants:'#25252a',hair:'#161616',num:'456',style:'frontman'},
+{id:'hulk',name:'هالک',price:7500000,shirt:'#318746',pants:'#5935a3',hair:'#1d281b',num:'',style:'hulk'},
+{id:'batman',name:'بتمن',price:1000,shirt:'#252b35',pants:'#171b23',hair:'#171717',num:'',style:'batman'},
+{id:'spiderman',name:'اسپایدرمن',price:1000,shirt:'#c51f2b',pants:'#183b83',hair:'#182a55',num:'',style:'spiderman'},
+{id:'harley_quinn',name:'هارلی کویین',price:1000,shirt:'#d8d8e5',pants:'#20243b',hair:'#e8e8f2',num:'',style:'harley'},
+{id:'ironman',name:'آیرون‌من',price:11000,shirt:'#a82427',pants:'#8b6323',hair:'#a82427',num:'',style:'ironman'},
+{id:'ghost_rider',name:'گوست رایدر',price:15000,shirt:'#17191d',pants:'#090b10',hair:'#ff6a16',num:'',style:'ghostrider'}
+];
+let selectedSkin='default',ownedSkins=[];
+// Load skin data from both dedicated keys and the main save, for older/mobile browser saves.
+try{
+ const skinSave=JSON.parse(localStorage.getItem('shahrAzad_gameSave')||'null');
+ const directOwned=JSON.parse(localStorage.getItem('shahrAzad_ownedSkins_v1')||'null');
+ const savedOwned=Array.isArray(directOwned)?directOwned:(skinSave&&Array.isArray(skinSave.ownedSkins)?skinSave.ownedSkins:[]);
+ ownedSkins=[...new Set(savedOwned.filter(id=>typeof id==='string'&&id!=='nariman'&&id!=='amirabbas'))];
+ selectedSkin=localStorage.getItem('shahrAzad_selectedSkin_v1')||(skinSave&&typeof skinSave.selectedSkin==='string'?skinSave.selectedSkin:'default');
+ if((selectedSkin==='nariman'||selectedSkin==='amirabbas')|| (selectedSkin!=='default'&&!ownedSkins.includes(selectedSkin)))selectedSkin='default';
+}catch(e){ownedSkins=[];selectedSkin='default'}
+function saveSkin(){
+ try{localStorage.setItem('shahrAzad_ownedSkins_v1',JSON.stringify(ownedSkins));localStorage.setItem('shahrAzad_selectedSkin_v1',selectedSkin);
+ const old=JSON.parse(localStorage.getItem('shahrAzad_gameSave')||'{}');
+ localStorage.setItem('shahrAzad_gameSave',JSON.stringify({...old,coins,hunger,hp,stars,rep,level,ownedSkins,selectedSkin}));
+ }catch(e){toast('ذخیره‌سازی مرورگر در دسترس نیست؛ بازی را در همان مرورگر باز کن')}
+}
+function drawPerson(a,x=a.x,y=a.y){
+ const skin=skinCatalog.find(v=>v.id===selectedSkin);
+ g.fillStyle='#0005';g.beginPath();g.ellipse(x,y+8,8,3,0,0,7);g.fill();
+ if(skin&&skin.style==='ghostrider'){
+  const flicker=Date.now()/130;
+  g.save();
+  // leather-clad body and boots
+  g.fillStyle='#080a0e';g.fillRect(x-6,y+8,5,9);g.fillRect(x+1,y+8,5,9);
+  g.fillStyle='#17191d';g.fillRect(x-8,y-2,16,12);
+  g.strokeStyle='#9b9b9b';g.lineWidth=1;g.beginPath();g.moveTo(x-5,y-1);g.lineTo(x+4,y+8);g.moveTo(x+5,y-1);g.lineTo(x-3,y+8);g.stroke();
+  // animated flames around the skull
+  for(let i=0;i<7;i++){
+   const side=i%2===0?-1:1, h=8+((i*7+Math.floor(flicker))%11);
+   g.fillStyle=i%3===0?'#ffd34f':'#ff6a16';
+   g.beginPath();g.moveTo(x+side*(5+i%3),y-11);g.quadraticCurveTo(x+side*(13+i%3),y-19-h*.25,x+side*(7+i%3),y-23-h*.35);g.quadraticCurveTo(x+side*(9+i%3),y-12,x+side*4,y-10);g.fill();
+  }
+  // ivory skull, sockets and jaw
+  g.fillStyle='#e6dfc8';g.beginPath();g.ellipse(x,y-9,7.2,8.2,0,0,Math.PI*2);g.fill();
+  g.fillStyle='#25201d';g.beginPath();g.ellipse(x-3,y-10,2.1,2.8,-.2,0,Math.PI*2);g.ellipse(x+3,y-10,2.1,2.8,.2,0,Math.PI*2);g.fill();
+  g.fillStyle='#ff9b22';g.shadowColor='#ff5a00';g.shadowBlur=8;g.fillRect(x-4,y-11,2,2);g.fillRect(x+2,y-11,2,2);g.shadowBlur=0;
+  g.fillStyle='#302823';g.beginPath();g.moveTo(x-1,y-6);g.lineTo(x+1,y-6);g.lineTo(x,y-4);g.fill();
+  g.strokeStyle='#5b5146';g.lineWidth=.8;g.beginPath();g.moveTo(x-4,y-2);g.lineTo(x+4,y-2);g.moveTo(x-3,y);g.lineTo(x-3,y+1);g.moveTo(x,y);g.lineTo(x,y+1);g.moveTo(x+3,y);g.lineTo(x+3,y+1);g.stroke();
+  // chain detail
+  g.strokeStyle='#b8b8b8';g.lineWidth=1;g.beginPath();g.arc(x,y+2,5,.2,Math.PI-.2);g.stroke();
+  g.restore();
+  return;
+ }
+
+ const shirt=skin?skin.shirt:(a.color||'#1b9ed3'), pants=skin?skin.pants:'#202735';
+ if(skin&&skin.style==='hulk'){g.fillStyle='#318746';g.fillRect(x-7,y-9,14,17);g.fillRect(x-10,y-3,4,10);g.fillRect(x+6,y-3,4,10);g.fillStyle='#5935a3';g.fillRect(x-6,y+8,5,9);g.fillRect(x+1,y+8,5,9)}
+ else {
+  g.fillStyle=pants;g.fillRect(x-5,y+8,4,8);g.fillRect(x+1,y+8,4,8);
+  g.fillStyle=shirt;g.fillRect(x-7,y-2,14,13);
+  if(skin&&skin.id==='messi'){
+   g.save();g.beginPath();g.rect(x-7,y-2,14,13);g.clip();
+   g.fillStyle='#78c9f2';
+   g.fillRect(x-6,y-2,2,13);g.fillRect(x-1,y-2,2,13);g.fillRect(x+4,y-2,2,13);
+   g.restore();
+  }
+ }
+ if(skin&&skin.style==='customface'&&customSkinFaces[skin.faceKey]&&customSkinFaces[skin.faceKey].complete){
+  g.save();g.beginPath();g.arc(x,y-7,9.5,0,Math.PI*2);g.clip();
+  g.imageSmoothingEnabled=true;g.imageSmoothingQuality='high';
+  g.drawImage(customSkinFaces[skin.faceKey],18,12,220,232,x-9.5,y-16.5,19,19);g.restore();
+ }else{
+  g.fillStyle=skin&&skin.style==='ironman'?'#a82427':skin&&skin.style==='pig'?'#e8dfd1':'#e9bd91';g.beginPath();g.arc(x,y-7,6,0,Math.PI*2);g.fill();
+  g.fillStyle=skin?skin.hair:'#282d3b';
+  if(skin&&skin.style==='batman'){g.beginPath();g.moveTo(x-6,y-10);g.lineTo(x-6,y-16);g.lineTo(x-2,y-12);g.lineTo(x+2,y-12);g.lineTo(x+6,y-16);g.lineTo(x+6,y-10);g.closePath();g.fill()}
+ else if(skin&&skin.style==='frontman'){g.fillRect(x-7,y-14,14,5);g.fillStyle='#c51e32';g.fillRect(x-5,y-1,10,10);g.fillStyle='#f2d7b5';g.fillRect(x-4,y-8,8,3);g.fillStyle='#111';g.fillRect(x-3,y-7,2,1);g.fillRect(x+1,y-7,2,1)}
+ else g.fillRect(x-6,y-12,12,4);
+ if(skin&&skin.style==='mask'){g.fillStyle='#ecebe4';g.fillRect(x-5,y-9,10,5);g.fillStyle='#222';g.fillRect(x-3,y-8,2,2);g.fillRect(x+1,y-8,2,2)}
+ if(skin&&skin.style==='ironman'){g.strokeStyle='#ffd65b';g.lineWidth=1.5;g.strokeRect(x-6,y-2,12,14);g.fillStyle='#9deaff';g.fillRect(x-2,y+1,4,3)}
+ if(skin&&skin.style==='pig'){g.fillStyle='#f3a5ad';g.fillRect(x-4,y-8,8,4);g.fillStyle='#222';g.fillRect(x-2,y-7,1,1);g.fillRect(x+1,y-7,1,1)}
+ if(skin&&skin.style==='spiderman'){g.strokeStyle='#111';g.lineWidth=.7;g.beginPath();g.moveTo(x-5,y-9);g.lineTo(x+5,y-5);g.moveTo(x+5,y-9);g.lineTo(x-5,y-5);g.moveTo(x,y-13);g.lineTo(x,y-2);g.stroke();g.fillStyle='#fff';g.fillRect(x-4,y-8,3,2);g.fillRect(x+1,y-8,3,2)}
+ if(skin&&skin.style==='harley'){g.fillStyle='#d52b46';g.fillRect(x-7,y-2,7,13);g.fillStyle='#263d83';g.fillRect(x,y-2,7,13);g.fillStyle='#d52b46';g.fillRect(x-6,y-13,4,3);g.fillStyle='#263d83';g.fillRect(x+2,y-13,4,3)}
+ if(skin&&skin.num){g.fillStyle=skin.numColor||'#fff';g.font='bold 6px Arial';g.textAlign='center';g.fillText(skin.num,x,y+5)}
+ if(skin&&skin.style==='suit'){g.strokeStyle='#e2e2e2';g.lineWidth=1;g.beginPath();g.moveTo(x,y-1);g.lineTo(x,y+9);g.stroke();g.fillStyle='#ddd';g.fillRect(x-1,y-1,2,4)}
+ }
+ // چشم‌ها و لبخند ثابت برای تمام اسکین‌ها، از جمله رونالدو و مسی
+ g.save();
+ g.strokeStyle='#3b241b';g.fillStyle='#241b18';g.lineWidth=0.9;g.lineCap='round';
+ g.beginPath();g.arc(x-2.6,y-7.8,0.8,0,Math.PI*2);g.fill();
+ g.beginPath();g.arc(x+2.6,y-7.8,0.8,0,Math.PI*2);g.fill();
+ g.beginPath();g.arc(x,y-5.2,2.1,0.18*Math.PI,0.82*Math.PI);g.stroke();
+ g.restore();
+}
+function drawWorld(){g.fillStyle='#243c37';g.fillRect(0,0,CW,CH);
+ // grassy city blocks
+ for(let x=0;x<CITYW;x+=stepX){for(let y=0;y<CH;y+=stepY){g.fillStyle='#6cab69';g.fillRect(x,y,blockW,blockH)}}
+ // continuous grid streets with crosswalks
+ for(let x=blockW;x<CITYW;x+=stepX){road(x,0,roadW,CH);for(let y=stepY-25;y<CH;y+=stepY){g.fillStyle='#f3f4ed';for(let k=0;k<7;k++)g.fillRect(x+5+k*7,y,4,18)}}
+ for(let y=blockH;y<CH;y+=stepY){road(0,y,CITYW+90,roadW);for(let x=stepX-25;x<CITYW;x+=stepX){g.fillStyle='#f3f4ed';for(let k=0;k<7;k++)g.fillRect(x,y+5+k*7,18,4)}}
+ // بزرگراه ۴۰۰۰ متری با مسیر برگشت به شهر
+ const hx=2200, hend=hx+4000, hy1=820, hy2=1120;
+ // حذف قطعه بزرگ و اضافی زمین تیره کنار بزرگراه؛ فقط خود مسیرها نمایش داده می‌شوند
+ road(hx,hy1,4000,74); road(hx,hy2,4000,74);
+ g.strokeStyle='#f5f2d5';g.lineWidth=3;g.setLineDash([28,22]);g.beginPath();g.moveTo(hx,hy1+37);g.lineTo(hend,hy1+37);g.moveTo(hx,hy2+37);g.lineTo(hend,hy2+37);g.stroke();g.setLineDash([]);
+ // اتصال پیوسته خیابان شهر به بزرگراه: رمپ عمودی و تقاطع بدون شکاف
+ // زمینه اضافی کنار خیابان اتصال حذف شد
+ road(CITYW-48,250,96,1120);
+ // زمینه اضافی تقاطع حذف شد
+ road(CITYW-48,hy1+37,340,84);
+ road(CITYW-48,hy2+37,340,84);
+ // وصله‌های آسفالت پهن در محل برخورد خیابان‌های شهر و رمپ؛ بدون درز باریک سبزرنگ
+ g.fillStyle='#465565';
+ g.fillRect(CITYW-58,hy1-12,116,98);
+ g.fillRect(CITYW-58,hy2-12,116,98);
+ // دوربرگردان انتهایی و رمپ اتصال دوباره به شهر
+ // قطعه‌های تیره اضافی انتهای بزرگراه حذف شدند
+ road(hend,hy1+37,74,263);
+ g.fillStyle='#164d83';g.fillRect(hx+100,hy1-34,210,27);g.fillStyle='#fff';g.font='bold 15px Tahoma';g.textAlign='center';g.fillText('شروع بزرگراه • ۰ متر',hx+205,hy1-15);
+ // تابلو راهنمای ورود به بزرگراه در لبه شهر
+ g.fillStyle='#164d83';g.fillRect(1910,760,220,38);g.fillStyle='#fff';g.font='bold 17px Tahoma';g.fillText('⬅ به سمت بزرگراه',2020,785);
+ g.fillStyle='#164d83';g.fillRect(hend-270,hy1-34,235,27);g.fillStyle='#fff';g.fillText('۴۰۰۰ متر • دوربرگردان',hend-152,hy1-15);
+ g.fillStyle='#164d83';g.fillRect(hx+120,hy2+82,220,27);g.fillStyle='#fff';g.fillText('مسیر برگشت به شهر',hx+230,hy2+101);
+
+ const pad=180,vx=cam.x-pad,vy=cam.y-pad,vw=W+pad*2,vh=H+pad*2;const visible=(x,y,w=0,h=0)=>x+w>=vx&&x<=vx+vw&&y+h>=vy&&y<=vy+vh;
+ // زمین کشاورزی و دکه کوچک بذر
+ if(visible(FARM.x,FARM.y,FARM.w,FARM.h)){
+  g.fillStyle='#8a653b';g.fillRect(FARM.x,FARM.y,FARM.w,FARM.h);
+  g.strokeStyle='#d8bd83';g.lineWidth=7;g.strokeRect(FARM.x,FARM.y,FARM.w,FARM.h);
+  g.fillStyle='#f4e5bd';g.font='bold 22px Tahoma';g.textAlign='center';g.fillText('زمین کشاورزی',FARM.x+FARM.w/2,FARM.y+FARM.h-18);
+   g.font='bold 13px Tahoma';g.fillStyle='#fff4c7';g.fillText('مزرعه شهر آزاد',FARM.x+FARM.w/2,FARM.y+25);
+  farmPlotSpots.forEach((spot,i)=>{
+   g.fillStyle='#513b25';g.fillRect(spot.x,spot.y,36,30);
+   g.strokeStyle='#c7a36b';g.lineWidth=3;g.strokeRect(spot.x,spot.y,36,30);
+   const plot=farmPlots[i];
+   if(plot){
+    const info=cropInfo(plot.type),ready=cropReady(plot);
+    g.fillStyle=plot.type==='banana'?'#4d9a38':'#b6a24a';
+    for(let k=0;k<5;k++){g.beginPath();g.ellipse(spot.x+5+k*6,spot.y+20-(k%2)*3,3,ready?11:6,0,0,Math.PI*2);g.fill()}
+    g.fillStyle='#fff';g.font='bold 13px Tahoma';g.fillText(ready?'آماده':info.emoji,spot.x+18,spot.y+9);
+   }else{
+    g.fillStyle='#ead6a7';g.font='bold 13px Tahoma';g.fillText('خالی',spot.x+18,spot.y+19);
+   }
+  });
+ }
+ if(visible(FARM.kioskX-5,FARM.kioskY-5,80,65)){
+  g.fillStyle='#704322';g.fillRect(FARM.kioskX,FARM.kioskY,58,42);
+  g.fillStyle='#d7a64b';g.fillRect(FARM.kioskX-4,FARM.kioskY-8,66,12);
+  g.fillStyle='#fff4d8';g.font='bold 14px Tahoma';g.textAlign='center';g.fillText('دکه بذر',FARM.kioskX+29,FARM.kioskY+21);
+  g.font='12px Tahoma';g.fillText('🌾 🍌',FARM.kioskX+29,FARM.kioskY+35);
+ }
+trees.forEach(t=>{if(visible(t.x-16,t.y-16,32,32))drawTree(t)});buildings.forEach(b=>{if(visible(b.x,b.y,b.w,b.h))drawBuilding(b)});
+ coinsMap.forEach(c=>{if(!c.got&&visible(c.x-8,c.y-8,16,16)){g.fillStyle='#ffb92e';g.beginPath();g.arc(c.x,c.y,5,0,7);g.fill();g.strokeStyle='#ffe28a';g.lineWidth=1;g.stroke()}});
+ cars.forEach(c=>{if(visible(c.x-25,c.y-25,50,50)){if(['honda_cub','cibi1300','kawasaki','click_motor'].includes(c.vehicleId))drawMotorcycle({color:c.color||'#d92727'},c.x,c.y,c.dir,1.15);else drawCar(c)}});highwayCars.forEach(c=>{if(visible(c.x-25,c.y-25,50,50))drawCar(c)});
+ if(snapRide&&snapRide.phase!=='done'&&visible(snapRide.x-28,snapRide.y-28,56,56))drawCar({color:'#f2c230'},snapRide.x,snapRide.y,snapRide.dir,1.35);
+ people.forEach(a=>{if(visible(a.x-12,a.y-15,24,30))drawPerson(a)});
+ if(p.car){const veh=selectedVehicle();if((p.vehicleId||selectedCar)==='honda_cub'||(p.vehicleId||selectedCar)==='cibi1300'||(p.vehicleId||selectedCar)==='kawasaki'||(p.vehicleId||selectedCar)==='click_motor')drawMotorcycle({color:p.carColor||veh.color||'#d92727'},p.x,p.y,p.dir,1.15);else drawCar({color:p.carColor||'#159a99'},p.x,p.y,p.dir,1.15);}else drawPerson({x:p.x,y:p.y,color:'#1b9ed3'});
+ 
+}
+window.__shahrAzad3DState={get p(){return p},get buildings(){return buildings},get trees(){return trees},get cars(){return cars},get highwayCars(){return highwayCars},get coinsMap(){return coinsMap},get selectedCar(){return selectedCar},get shopCars(){return shopCars},get playerVehicle(){return p.vehicleId||selectedCar}};
+let lastRender=0;function loop(now=0){
+ requestAnimationFrame(loop);if(now-lastRender<33)return;lastRender=now;updateSnapRide();updateComingSoonButton();
+ // رفت و برگشت مداوم ده ماشین در اتوبان ۴۰۰۰ متری
+ highwayCars.forEach(c=>{c.x+=(c.lane===0?1:-1)*c.speed;if(c.lane===0&&c.x>6150)c.x=2280;if(c.lane===1&&c.x<2280)c.x=6150;});
+ g.clearRect(0,0,W,H);cam.x=Math.max(0,Math.min(CW-W,p.x-W/2));cam.y=Math.max(0,Math.min(CH-H,p.y-H/2));g.save();g.translate(-cam.x,-cam.y);drawWorld();g.restore();
+ const rt=document.getElementById('roleTag');
+ const playerName=currentPlayerName();
+ const hasRole=!!(activeJob||isPresident||isObserver);
+ rt.style.display=(playerName && playerName!=='بازیکن')||hasRole?'block':'none';
+ if(rt.style.display==='block'){
+   rt.replaceChildren();
+   if(hasRole){
+     const jobLine=document.createElement('div');
+     jobLine.textContent=isPresident?'🇮🇷 رئیس‌جمهور':(isObserver?'🛡️ ناظر':activeJob.name);
+     rt.appendChild(jobLine);
+   }
+   const nameLine=document.createElement('div');
+   nameLine.textContent=playerName;
+   nameLine.style.marginTop=hasRole?'3px':'0';
+   rt.appendChild(nameLine);
+   rt.style.whiteSpace='normal';
+   rt.style.textAlign='center';
+   rt.style.lineHeight='1.25';
+   rt.style.left=(p.x-cam.x)+'px';
+   rt.style.top=(p.y-cam.y-34)+'px';
+ }
+ // دکمهٔ ورود فقط وقتی نمایش داده می‌شود که بازیکن به لبهٔ خود ساختمان رسیده باشد؛ فاصله از مرکز ساختمان معیار نیست.
+ const isAtDoor=(b,limit=34)=>{if(!b)return false;const dx=Math.max(b.x-p.x,0,p.x-(b.x+b.w));const dy=Math.max(b.y-p.y,0,p.y-(b.y+b.h));return Math.hypot(dx,dy)<=limit;};
+ const showroom=buildings.find(b=>b.type==='نمایشگاه');document.getElementById('showroomEnter').style.display=isAtDoor(showroom)&&!p.car?'block':'none';
+ const restaurant=buildings.find(b=>b.type==='رستوران');document.getElementById('restaurantEnter').style.display=isAtDoor(restaurant)&&!p.car?'block':'none';
+ const cafe=buildings.find(b=>b.type==='کافه');document.getElementById('cafeEnter').style.display=isAtDoor(cafe,34)&&!p.car?'block':'none';
+ const supermarket=buildings.find(b=>b.type==='سوپرمارکت');document.getElementById('supermarketEnter').style.display=isAtDoor(supermarket)&&!p.car?'block':'none';
+ const station=buildings.find(b=>b.type==='پمپ بنزین');document.getElementById('fuelEnter').style.display=isAtDoor(station,42)&&!!p.car?'block':'none';
+ const bank=buildings.find(b=>b.type==='بانک');document.getElementById('bankEnter').style.display=isAtDoor(bank)&&!p.car?'block':'none';
+ const clothingShop=buildings.find(b=>b.type==='لباس');document.getElementById('clothingEnter').style.display=isAtDoor(clothingShop)&&!p.car?'block':'none';
+ const cinema=buildings.find(b=>b.type==='سینما');document.getElementById('cinemaEnter').style.display=isAtDoor(cinema)&&!p.car?'block':'none';
+}
+function syncFuel(){const e=document.getElementById('fuelValue');if(e)e.textContent=Math.round(fuelLiters).toLocaleString('fa-IR');}
+function openFuelStation(){modal('⛽ پمپ بنزین شهر آزاد','ظرفیت باک ماشین ۶۰ لیتر است. هر بار زدن دکمه، ۱ لیتر بنزین اضافه می‌شود و ۱ سکه هزینه دارد. بنزین فعلی: '+Math.round(fuelLiters)+' از ۶۰ لیتر.',[['➕ افزودن ۱ لیتر بنزین — ۱ سکه',()=>{if(fuelLiters>=60){toast('باک ماشین پر است! ⛽');return}if(coins<1){toast('حتی برای یک لیتر هم سکه کافی نداری!');return}coins-=1;fuelLiters=Math.min(60,fuelLiters+1);fuelTick=Date.now();hud();syncFuel();close();toast('۱ لیتر بنزین اضافه شد • '+Math.round(fuelLiters)+' از ۶۰ لیتر') }],['⛽ افزودن ۱۰ لیتر — ۱۰ سکه',()=>{const add=Math.min(10,60-fuelLiters);if(add<=0){toast('باک ماشین پر است!');return}if(coins<add){toast('سکه کافی نداری!');return}coins-=add;fuelLiters+=add;fuelTick=Date.now();hud();syncFuel();close();toast(add+' لیتر بنزین اضافه شد')}]]);}
+document.getElementById('fuelEnter').onclick=openFuelStation;
+document.getElementById('bankEnter').onclick=openBank;
+document.getElementById('clothingEnter').onclick=openClothingShop;
+document.getElementById('cinemaEnter').onclick=()=>toast('🎬 سینما در آپدیت بعدی فعال می‌شود!');
+function openClothingShop(){
+ const options=[['👤 لباس معمولی — رایگان',()=>{selectedSkin='default';saveSkin();hud();close();toast('لباس معمولی انتخاب شد')}]];
+ skinCatalog.forEach(sk=>{
+  const owned=ownedSkins.includes(sk.id);
+  const priceText=sk.price===null?'قیمت تعیین نشده':sk.price.toLocaleString('fa-IR')+' سکه';
+  options.push([`${owned?'✅ خریداری شده':'👕 خرید'} ${sk.name}${owned?'':(' — '+priceText)}${selectedSkin===sk.id?' • انتخاب شده':''}`,()=>{
+   if(sk.price===null){toast('این اسکین فعلاً قابل خرید نیست');return;}
+   if(ownedSkins.includes(sk.id)){
+    selectedSkin=sk.id;saveSkin();hud();close();toast('این اسکین را دارید؛ '+sk.name+' انتخاب شد ✅');return;
+   }
+   if(!Number.isFinite(sk.price)||sk.price<0){toast('قیمت اسکین معتبر نیست');return;}
+   if(!Number.isFinite(coins)||coins<sk.price){toast('سکه کافی نداری؛ قیمت: '+sk.price.toLocaleString('fa-IR')+' سکه');return;}
+   coins-=sk.price;
+   ownedSkins.push(sk.id);
+   selectedSkin=sk.id;
+   saveSkin();hud();close();
+   toast('خرید موفق! '+sk.name+' خریداری و انتخاب شد 🎉');
+  }]);
+ });
+ modal('👕 فروشگاه لباس','اسکین‌های ویژه: اسپایدرمن، بتمن و هارلی کویین؛ هرکدام ۱٬۰۰۰ سکه. گوست رایدر با شعله‌های متحرک ۱۵٬۰۰۰ سکه است. اسکین‌های خریداری‌شده را رایگان انتخاب کن.',options);
+}
+
+function toast(s){let e=document.getElementById('toast');e.textContent=s;e.style.display='block';clearTimeout(toastTimeout);toastTimeout=setTimeout(()=>e.style.display='none',2300)}
+try{const saved=JSON.parse(localStorage.getItem('shahrAzad_gameSave')||'null');if(saved){if(localStorage.getItem('shahrAzad_starting_coins_1500_v1')!=='1'){coins=1500;localStorage.setItem('shahrAzad_starting_coins_1500_v1','1');}else if(Number.isFinite(saved.coins))coins=saved.coins;if(Number.isFinite(saved.hp))hp=saved.hp;if(Number.isFinite(saved.stars))stars=saved.stars;if(Number.isFinite(saved.rep))rep=saved.rep;if(Number.isFinite(saved.level))level=saved.level; if(localStorage.getItem('shahrAzad_hunger_v2')==='1' && Number.isFinite(saved.hunger))hunger=saved.hunger;} localStorage.setItem('shahrAzad_hunger_v2','1'); if(localStorage.getItem('shahrAzad_initial_hp_100_v1')!=='1'){hp=100;localStorage.setItem('shahrAzad_initial_hp_100_v1','1');} if(localStorage.getItem('shahrAzad_starting_stats_20261107_v1')!=='1'){hunger=50;hp=70;rep=10;level=5;localStorage.setItem('shahrAzad_starting_stats_20261107_v1','1');}}catch(e){hunger=50;hp=70;rep=10;level=5;}
+// مقدار اولیه ستاره‌های سمت چپ HUD برای همه ذخیره‌های قبلی نیز ۱۵ می‌شود.
+try{if(localStorage.getItem('shahrAzad_initial_stars_15_v1')!=='1'){stars=15;localStorage.setItem('shahrAzad_initial_stars_15_v1','1');}}catch(e){stars=15;}
+try{const gs=JSON.parse(localStorage.getItem('shahrAzad_gameSave')||'null');if(gs){if(Array.isArray(gs.ownedSkins))ownedSkins=[...new Set(gs.ownedSkins.filter(id=>typeof id==='string'&&id!=='nariman'&&id!=='amirabbas'))];if(typeof gs.selectedSkin==='string'&&(gs.selectedSkin==='default'||ownedSkins.includes(gs.selectedSkin)))selectedSkin=gs.selectedSkin;}}catch(e){}
+let hungerTick=Date.now(),healthTick=Date.now(),hungerRemainder=0;
+// مصرف بنزین: هر ۱ دقیقه، هنگام سوار بودن در ماشین، ۲ لیتر کم می‌شود.
+let fuelTick=Date.now();
+function hungerStep(){
+ const now=Date.now();
+ // Only adjust hunger drain. Character movement and joystick code remain unchanged.
+ const intensity=Math.min(1,Math.hypot(joystick.x||0,joystick.y||0));
+ let rate=10;
+ if(intensity>=0.80) rate=100;       // تند
+ else if(intensity>=0.65) rate=90;  // کمی کمتر از تند
+ else if(intensity>=0.45) rate=30;  // کمی آرام‌تر
+ else if(intensity>=0.20) rate=20;  // آرام
+ else rate=10;                      // خیلی آرام یا بی‌حرکت
+ const elapsed=Math.max(0,now-hungerTick);
+ hungerRemainder=(hungerRemainder||0)+(elapsed/20000)*(rate/100);
+ const whole=Math.floor(hungerRemainder);
+ if(whole>0){hunger=Math.max(0,hunger-whole);hungerRemainder-=whole;}
+ hungerTick=now;
+ if(now-healthTick>=120000){const hits=Math.floor((now-healthTick)/120000);hp=Math.max(0,hp-3*hits);healthTick+=hits*120000;}
+}
+function hud(){hunger=Math.max(0,Math.min(100,Math.round(hunger)));hp=Math.max(0,Math.min(100,Math.round(hp)));for(let [id,v] of Object.entries({coins,hunger,hp,stars,rep,level}))document.getElementById(id).textContent=v;document.getElementById('hpbar').style.width=hp+'%';try{localStorage.setItem('shahrAzad_gameSave',JSON.stringify({coins,hunger,hp,stars,rep,level,ownedSkins,selectedSkin}))}catch(e){}}
+function payCoins(amount,description,onPaid){amount=Math.floor(Number(amount));if(!Number.isFinite(amount)||amount<1){toast('مبلغ خرید معتبر نیست');return}if(!Number.isFinite(coins)||coins<amount){toast('سکهٔ کیف پول کافی نیست؛ قیمت: '+amount.toLocaleString('fa-IR')+' سکه');return}coins-=amount;hud();if(typeof onPaid==='function')onPaid();hud();toast('پرداخت از کیف پول انجام شد؛ '+description+' 🪙')}
+function modal(title,txt,opts=[]){document.getElementById('modal').classList.remove('phoneMode');document.getElementById('mtitle').textContent=title;document.getElementById('mtext').textContent=txt;let a=document.getElementById('actions');a.innerHTML='';opts.forEach(o=>{let b=document.createElement('button');b.textContent=o[0];b.onclick=o[1];a.appendChild(b)});document.getElementById('modal').style.display='block'}
+function close(){setSnapBoardButton(false);const m=document.getElementById('modal');m.style.display='none';m.classList.remove('phoneMode')}
+let viewYaw=0,viewPitch=0,lookDrag=null;
+function move(dx,dy){
+ const ca=Math.cos(viewYaw),sa=Math.sin(viewYaw),rawX=dx,rawY=dy;dx=rawX*ca-rawY*sa;dy=rawX*sa+rawY*ca;
+ let n=Math.hypot(dx,dy);if(n<.12)return;
+ let sp=4.4;
+ if(!p.car){
+   // سرعت حرکت بر اساس مقدار فعلی نوار گرسنگی؛ دویدن فقط تا وقتی دکمه نگه داشته شود.
+   const hungerLevel=Math.max(0,Math.min(100,Number(hunger)||0));
+   const runSpeed = hungerLevel>=100?3.1 : hungerLevel>=90?2.8 : hungerLevel>=30?1.8 : hungerLevel>=20?1.3 : hungerLevel>=10?0.8 : 0.18;
+   const walkSpeed = hungerLevel>=100?2.0 : hungerLevel>=90?1.8 : hungerLevel>=30?1.2 : hungerLevel>=20?0.85 : hungerLevel>=10?0.5 : 0.08;
+   sp=p.run?runSpeed:walkSpeed;
+ }
+ let ux=dx/n*sp,uy=dy/n*sp;
+ const radius=p.car?24:13;
+ // Resolve each axis separately so the player/car cannot pass through building walls.
+ let nx=Math.max(20,Math.min(CW-20,p.x+ux));
+ if(!insideBuilding(nx,p.y,radius))p.x=nx;
+ let ny=Math.max(20,Math.min(CH-20,p.y+uy));
+ if(!insideBuilding(p.x,ny,radius))p.y=ny;
+ p.dir=Math.atan2(dy,dx);
+ let collected=0;
+ coinsMap.forEach(c=>{if(!c.got&&Math.hypot(c.x-p.x,c.y-p.y)<(p.car?34:27)){c.got=true;coins+=10;stars++;collected++;if(stars%5===0)level++}});
+ if(collected){hud();toast('🪙 '+collected+' سکه جمع کردی! +'+(collected*10)+' سکه')}
+}
+function currentVehicleMaxSpeed(){const id=p.vehicleId||selectedCar;const v=shopCars.find(c=>c.id===id);return v&&Number.isFinite(v.speed)?v.speed:70;}
+function syncSpeedometer(){const el=document.getElementById('speedValue');if(el)el.textContent=String(Math.min(currentVehicleMaxSpeed(),Math.round(carSpeedKmh)));}
+hud();function update(){const nowFuel=Date.now();if(p.car){if(nowFuel-fuelTick>=60000){const fuelSteps=Math.floor((nowFuel-fuelTick)/60000);fuelLiters=Math.max(0,fuelLiters-2*fuelSteps);fuelTick+=fuelSteps*60000;syncFuel();if(fuelLiters<=0){toast('⛽ بنزین تمام شد! به پمپ بنزین برو')}else{toast('⛽ ۲ لیتر بنزین مصرف شد؛ باقی‌مانده: '+Math.round(fuelLiters)+' لیتر')}}}else{fuelTick=nowFuel;}const oldHunger=hunger,oldHp=hp;hungerStep();if(oldHunger!==hunger||oldHp!==hp)hud();let dx=joystick.x,dy=joystick.y;if(keys.ArrowLeft||keys.a)dx--;if(keys.ArrowRight||keys.d)dx++;if(keys.ArrowUp||keys.w)dy--;if(keys.ArrowDown||keys.s)dy++;if(p.car){
+ // Car controls: gas moves forward in the direction the car faces; steering turns the car.
+ const steering=(drive.right?1:0)-(drive.left?1:0);
+ const maxSpeed=currentVehicleMaxSpeed(); if(drive.gas)carSpeedKmh=Math.min(maxSpeed,carSpeedKmh+0.9);else if(drive.brake)carSpeedKmh=Math.max(0,carSpeedKmh-2.0);else carSpeedKmh=0;syncSpeedometer();
+ if(carSpeedKmh>0.1){p.dir+=steering*(0.009+carSpeedKmh*0.00020);const speed=carSpeedKmh/10;const mx=Math.cos(p.dir)*speed,my=Math.sin(p.dir)*speed;
+ const nx=Math.max(20,Math.min(CW-20,p.x+mx)),ny=Math.max(20,Math.min(CH-20,p.y+my));
+ // حرکت مورب از خیابان مجاز نیست؛ خودرو در محور آسفالت باقی می‌ماند.
+ if(isDriveRoad(nx,ny)&&!insideBuilding(nx,ny,20)){p.x=nx;p.y=ny;}
+ else if(isDriveRoad(nx,p.y)&&!insideBuilding(nx,p.y,20)){p.x=nx;}
+ else if(isDriveRoad(p.x,ny)&&!insideBuilding(p.x,ny,20)){p.y=ny;}
+ let collected=0;coinsMap.forEach(c=>{if(!c.got&&Math.hypot(c.x-p.x,c.y-p.y)<34){c.got=true;coins+=10;stars++;collected++;if(stars%5===0)level++}});if(collected){hud();toast('🪙 '+collected+' سکه جمع کردی! +'+(collected*10)+' سکه')}
+ }else if(steering){p.dir+=steering*0.035;}
+ }else move(dx,dy);requestAnimationFrame(update)}
+const joy=document.getElementById('joy'),nub=document.getElementById('nub');
+function setJoy(e){let r=joy.getBoundingClientRect(),dx=e.clientX-(r.left+r.width/2),dy=e.clientY-(r.top+r.height/2),lim=r.width*.34,m=Math.hypot(dx,dy);if(m>lim){dx=dx/m*lim;dy=dy/m*lim}joystick.x=dx/lim;joystick.y=dy/lim;nub.style.transform=`translate(${dx}px,${dy}px)`}
+joy.onpointerdown=e=>{joystick.active=true;joy.setPointerCapture(e.pointerId);setJoy(e)};joy.onpointermove=e=>{if(joystick.active)setJoy(e)};function release(){joystick.active=false;joystick.x=joystick.y=0;nub.style.transform='translate(0,0)'}joy.onpointerup=release;joy.onpointercancel=release;
+// Drag the open game area to look around; movement joystick stays independent.
+const gameCanvas=document.getElementById('world3d')||document.getElementById('c');
+gameCanvas.addEventListener('pointerdown',e=>{lookDrag={id:e.pointerId,x:e.clientX,y:e.clientY};gameCanvas.setPointerCapture(e.pointerId);});
+gameCanvas.addEventListener('pointermove',e=>{
+ if(!lookDrag||lookDrag.id!==e.pointerId)return;
+ const dx=e.clientX-lookDrag.x,dy=e.clientY-lookDrag.y;
+ lookDrag.x=e.clientX;lookDrag.y=e.clientY;
+ viewYaw-=dx*0.008;
+ viewPitch=Math.max(-0.18,Math.min(0.42,viewPitch+dy*0.003));
+});
+function endLook(e){if(lookDrag&&lookDrag.id===e.pointerId)lookDrag=null;}
+gameCanvas.addEventListener('pointerup',endLook);gameCanvas.addEventListener('pointercancel',endLook);
+addEventListener('keydown',e=>{keys[e.key]=true;if(e.key==='Shift')p.run=true});addEventListener('keyup',e=>{keys[e.key]=false;if(e.key==='Shift')p.run=false});
+const runButton=document.getElementById('run'); runButton.style.touchAction='none'; const startRun=e=>{if(e.cancelable)e.preventDefault();p.run=true;}; const stopRun=e=>{if(e&&e.cancelable)e.preventDefault();p.run=false;}; runButton.addEventListener('pointerdown',startRun,{passive:false}); ['pointerup','pointercancel','pointerleave','lostpointercapture'].forEach(ev=>runButton.addEventListener(ev,stopRun)); runButton.addEventListener('contextmenu',e=>e.preventDefault());
+const driveControls=document.getElementById('driveControls');
+const steerJoy=document.getElementById('steerJoy'),steerNub=document.getElementById('steerNub');let steeringPointer=null,lastWheelAngle=null,wheelRotation=0;
+function steerMove(e){const r=steerJoy.getBoundingClientRect(),cx=r.left+r.width/2,cy=r.top+r.height/2;const a=Math.atan2(e.clientY-cy,e.clientX-cx)*180/Math.PI;if(lastWheelAngle!==null){let d=a-lastWheelAngle;if(d>180)d-=360;if(d< -180)d+=360;wheelRotation=Math.max(-150,Math.min(150,wheelRotation+d));}lastWheelAngle=a;steerJoy.style.transform=`rotate(${wheelRotation}deg)`;drive.left=wheelRotation < -10;drive.right=wheelRotation > 10;}
+steerJoy.addEventListener('pointerdown',e=>{e.preventDefault();steeringPointer=e.pointerId;lastWheelAngle=null;steerJoy.setPointerCapture(e.pointerId);steerMove(e)},{passive:false});
+steerJoy.addEventListener('pointermove',e=>{if(steeringPointer===e.pointerId)steerMove(e)});
+function steerRelease(){steeringPointer=null;lastWheelAngle=null;drive.left=false;drive.right=false;wheelRotation=0;steerJoy.style.transition='transform .18s ease-out';steerJoy.style.transform='rotate(0deg)';setTimeout(()=>steerJoy.style.transition='',190)}
+steerJoy.addEventListener('pointerup',steerRelease);steerJoy.addEventListener('pointercancel',steerRelease);
+function holdButton(id,key){const el=document.getElementById(id);el.style.touchAction='none';const down=e=>{if(e.cancelable)e.preventDefault();drive[key]=true;};const up=e=>{if(e&&e.cancelable)e.preventDefault();drive[key]=false;};el.addEventListener('pointerdown',down,{passive:false});['pointerup','pointercancel','pointerleave','lostpointercapture'].forEach(ev=>el.addEventListener(ev,up));el.addEventListener('contextmenu',e=>e.preventDefault());}
+holdButton('steerL','left');holdButton('steerR','right');holdButton('gas','gas');holdButton('brake','brake');
+document.getElementById('carbtn').onclick=()=>{if(p.car){const vx=p.x,vy=p.y,vd=p.dir||0,vid=p.vehicleId||selectedCar,vc=shopCars.find(v=>v.id===vid)||{color:p.carColor||'#159a99'};if(!cars.some(c=>c.playerParked&&Math.hypot(c.x-vx,c.y-vy)<8)){cars.push({x:vx,y:vy,dir:vd,color:p.carColor||vc.color||'#159a99',vehicleId:vid,playerParked:true,parked:true})}p.car=false;carSpeedKmh=0;p.x=Math.max(25,Math.min(CW-25,vx+Math.cos(vd+Math.PI/2)*38));p.y=Math.max(25,Math.min(CH-25,vy+Math.sin(vd+Math.PI/2)*38));syncSpeedometer();document.getElementById('speedometer').style.display='none';document.getElementById('fuelDisplay').style.display='none';document.getElementById('fuelEnter').style.display='none';drive={left:false,right:false,gas:false,brake:false};driveControls.style.display='none';steerJoy.style.display='none';joy.style.display='grid';syncCarButton();saveGarage();saveFullGame();toast('پیاده شدی؛ ماشین همان‌جا پارک شد و ذخیره شد');return}let c=cars.find(c=>Math.hypot(c.x-p.x,c.y-p.y)<80)||cars.find(c=>Math.hypot(c.x-p.x,c.y-p.y)<55);if(c){p.car=true;p.vehicleId=c.vehicleId||'starter';p.carColor=c.color||'#159a99';selectedCar=p.vehicleId;cars.splice(cars.indexOf(c),1);carSpeedKmh=0;syncSpeedometer();document.getElementById('speedometer').style.display='block';document.getElementById('fuelDisplay').style.display='block';syncFuel();p.x=c.x;p.y=c.y;p.dir=c.dir||0;driveControls.style.display='flex';joy.style.display='none';steerJoy.style.display='flex';syncCarButton();toast('سوار وسیله نقلیه شدی! گاز را نگه دار تا حرکت کند')}else toast('کنار ماشین یا موتور پارک‌شده برو')} ;
+syncCarButton();
+document.getElementById('showroomEnter').onclick=openShowroom;
+document.getElementById('restaurantEnter').onclick=()=>document.getElementById('interact').click();
+document.getElementById('cafeEnter').onclick=()=>{const b=buildings.filter(v=>v.type==='کافه').sort((a,b)=>Math.hypot(a.x+a.w/2-p.x,a.y+a.h/2-p.y)-Math.hypot(b.x+b.w/2-p.x,b.y+b.h/2-p.y))[0];if(!b){toast('کافه پیدا نشد');return}const menu=[['☕ قهوه — ۳۵ سکه • +۲۵ گرسنگی',35,25],['🍳 املت — ۵۰ سکه • +۴۵ گرسنگی',50,45],['☕ اسپرسو — ۷۰ سکه • +۵۰ گرسنگی',70,50]];modal('☕ ورود به کافه '+b.name,'سفارش خودت را انتخاب کن؛ پرداخت فقط با کارت زاپ انجام می‌شود.',menu.map(([label,price,fill],idx)=>[label,()=>{if(backpackUsed()>=backpackCapacity){toast('کوله‌پشتی پر است؛ اول یک جایگاه باز کن یا چیزی مصرف کن');return}const itemId=['coffee','omelet','espresso'][idx];payWithZap(price,'خرید از کافه',()=>{addBackpackItem(itemId);close();toast('سفارش خریداری شد و داخل کوله‌پشتی قرار گرفت 🎒')})}]));};
+function openSupermarket(){modal('🛒 سوپرمارکت','خریدها به کوله‌پشتی می‌روند. ظرفیت خالی: '+Math.max(0,backpackCapacity-backpackUsed())+' جایگاه.',foodItems.slice(0,6).map(it=>[it.emoji+' '+it.name+' — '+it.price+' سکه • سیرکنندگی +'+it.fill,()=>{if(backpackUsed()>=backpackCapacity){toast('کوله‌پشتی پر است؛ اول ظرفیت را افزایش بده یا چیزی مصرف کن');return}payWithZap(it.price,'خرید '+it.name+' از سوپرمارکت',()=>{addBackpackItem(it.id);hud();close();toast(it.name+' خریداری شد و به کوله‌پشتی اضافه شد 🎒')})} ]));}
+document.getElementById('supermarketEnter').onclick=openSupermarket;
+function updateComingSoonButton(){
+ // دکمهٔ کوچک در مرکز صفحه، مستقل از دکمهٔ تعامل؛ با نزدیک شدن به هر ساختمان ظاهر می‌شود.
+ const entry=document.getElementById('buildingEntryBtn');
+ if(!entry)return;
+ const target=!p.car?buildings.map(b=>{
+   const dx=Math.max(b.x-p.x,0,p.x-(b.x+b.w));
+   const dy=Math.max(b.y-p.y,0,p.y-(b.y+b.h));
+   return {b,d:Math.hypot(dx,dy)};
+ }).filter(v=>v.d<=38).sort((a,b)=>a.d-b.d)[0]:null;
+ if(target){
+   const place=target.b.name||target.b.type;
+   entry.style.display='block';
+   entry.dataset.place=place;
+   entry.textContent='🚪 ورود به '+place;
+ }else{
+   entry.style.display='none';
+   entry.dataset.place='';
+ }
+}
+document.getElementById('buildingEntryBtn').onclick=()=>toast('🚧 ورود به '+(document.getElementById('buildingEntryBtn').dataset.place||'این مکان')+' در آپدیت بعدی فعال می‌شود');
+document.getElementById('interact').onclick=()=>{
+ if(Math.hypot(p.x-(FARM.kioskX+29),p.y-(FARM.kioskY+21))<105){openFarmShop();return}
+ if(p.x>FARM.x-35&&p.x<FARM.x+FARM.w+35&&p.y>FARM.y-35&&p.y<FARM.y+FARM.h+35){openFarm();return}
+ let b=buildings.filter(b=>Math.hypot(b.x+b.w/2-p.x,b.y+b.h/2-p.y)<245).sort((a,b)=>Math.hypot(a.x+a.w/2-p.x,a.y+a.h/2-p.y)-Math.hypot(b.x+b.w/2-p.x,b.y+b.h/2-p.y))[0];if(b&&b.type==='نمایشگاه'){openShowroom();return}if(b&&b.type==='پمپ بنزین'){if(!p.car){toast('برای بنزین زدن باید سوار ماشین باشی');return}openFuelStation();return}if(!b){let person=people.find(a=>Math.hypot(a.x-p.x,a.y-p.y)<40);if(person){rep++;hud();toast('با شهروند صحبت کردی • اعتبار +۱');return}toast('نزدیک یک ساختمان یا شهروند برو');return}
+ if(b.type==='سوپرمارکت'){openSupermarket();} else if(b.type==='رستوران'){const menu=[['🍗 جوجه‌کباب — ۱۵۰ سکه • +۳۰ جون',150,30],['🍔 همبرگر — ۲۰۰ سکه • +۵۰ جون',200,50],['🧆 فلافل — ۲۵۰ سکه • +۷۰ جون',250,70],['🥩 کباب — ۳۰۰ سکه • +۹۰ جون',300,90],['🍲 خورشت قیمه — ۳۳۰ سکه • +۱۰۰ جون',330,100]];modal('🍽️ ورود به رستوران','غذا انتخاب کن؛ پرداخت فقط با کارت زاپ انجام می‌شود.',menu.map(([label,price,heal],idx)=>[label,()=>{if(backpackUsed()>=backpackCapacity){toast('کوله‌پشتی پر است؛ اول یک جایگاه باز کن یا چیزی مصرف کن');return}const itemId=['joojeh','burger','falafel','kebab','ghimeh'][idx];payWithZap(price,'خرید غذا از رستوران',()=>{addBackpackItem(itemId);close();toast('غذا خریداری شد و داخل کوله‌پشتی قرار گرفت؛ هر وقت خواستی استفاده کن 🎒')})}]))} else if(b.type==='کافه'){const cafeMenu=[['☕ قهوه — ۳۵ سکه • +۲۵ گرسنگی',35,25],['🍳 املت — ۵۰ سکه • +۴۵ گرسنگی',50,45],['☕ اسپرسو — ۷۰ سکه • +۵۰ گرسنگی',70,50]];modal('☕ کافه '+b.name,'سفارش خودت را انتخاب کن؛ پرداخت فقط با کارت زاپ انجام می‌شود.',cafeMenu.map(([label,price,fill],idx)=>[label,()=>{if(backpackUsed()>=backpackCapacity){toast('کوله‌پشتی پر است؛ اول یک جایگاه باز کن یا چیزی مصرف کن');return}const itemId=['coffee','omelet','espresso'][idx];payWithZap(price,'خرید از کافه',()=>{addBackpackItem(itemId);close();toast('سفارش خریداری شد و داخل کوله‌پشتی قرار گرفت 🎒')})}]));}
+ else if(b.type==='بانک')openBank();
+ else if(b.type==='بیمارستان'||b.type==='درمانگاه')modal('🏥 درمانگاه','سلامتی خودت را بازیابی کن',[['درمان - 40 سکه',()=>{if(coins>=40){coins-=40;hp=100;hud();toast('سلامتی کامل شد')}else toast('سکه کافی نداری');close()}]]);
+ else modal('🏙️ '+b.name,'به '+b.name+' خوش آمدی! اینجا بخشی از شهر آزاد توست.',[['استراحت و بازیابی',()=>{hp=Math.min(100,hp+10);hunger=Math.min(100,hunger+5);hud();close();toast('کمی استراحت کردی')}],['گرفتن پاداش 5 سکه',()=>{coins+=5;hud();close();toast('+۵ سکه')}]]);};
+
+
+// کارت زاپ: کارت بانکی مجازی داخل بازی؛ رمز و موجودی فقط در حافظه محلی همین مرورگر ذخیره می‌شوند.
+let zapCard={};try{const savedZap=JSON.parse(localStorage.getItem('shahrAzad_zapCard')||'{}');if(savedZap&&typeof savedZap==='object'&&(!savedZap.pin||/^\d{4,8}$/.test(String(savedZap.pin))))zapCard=savedZap;}catch(e){zapCard={}}
+function saveZapCard(){try{localStorage.setItem('shahrAzad_zapCard',JSON.stringify(zapCard))}catch(e){}}
+function openZapCard(){
+ const a=document.getElementById('actions');
+ if(!zapCard.pin){modal('💳 کارت زاپ','برای ساخت کارت بانکی مجازی، یک رمز ۴ تا ۸ رقمی تعیین کن. این کارت فقط داخل بازی است و به بانک واقعی وصل نیست.',[]);a.innerHTML='<input id="zapNewPin" type="password" inputmode="numeric" maxlength="8" placeholder="رمز ۴ تا ۸ رقمی" style="width:100%;padding:12px;border-radius:10px;margin:6px 0"><input id="zapNewPin2" type="password" inputmode="numeric" maxlength="8" placeholder="تکرار رمز" style="width:100%;padding:12px;border-radius:10px;margin:6px 0"><button id="zapCreate">ساخت کارت زاپ 💳</button>';document.getElementById('zapCreate').onclick=()=>{let x=document.getElementById('zapNewPin').value,y=document.getElementById('zapNewPin2').value;if(!/^\d{4,8}$/.test(x)){toast('رمز باید ۴ تا ۸ رقم باشد');return}if(x!==y){toast('رمزها یکسان نیستند');return}zapCard={pin:x,balance:0,number:String(Math.floor(10000000+Math.random()*90000000))};saveZapCard();toast('کارت زاپ ساخته شد');openZapCard()};return;}
+ modal('💳 کارت زاپ','کارت مجازی بازی • شماره: '+zapCard.number+' • موجودی: '+Number(zapCard.balance||0).toLocaleString('fa-IR')+' سکه',[]);a.innerHTML='<button id="zapRevealPin">👁️ نمایش رمز کارت</button><div id="zapPinShown" style="display:none;padding:10px;margin:8px 0;border-radius:10px;background:#e8f4ff;color:#123;font-weight:bold"></div><button id="zapTopup">➕ شارژ کارت با سکه‌های کیف پول</button><button id="zapBuyInfo">🛍️ راهنمای پرداخت</button><button id="zapChangePin">🔐 تغییر رمز کارت</button>';document.getElementById('zapRevealPin').onclick=()=>{const box=document.getElementById('zapPinShown');const btn=document.getElementById('zapRevealPin');if(box.style.display==='none'){box.textContent='رمز کارت زاپ: '+zapCard.pin;box.style.display='block';btn.textContent='🙈 مخفی کردن رمز'}else{box.style.display='none';box.textContent='';btn.textContent='👁️ نمایش رمز کارت'}};document.getElementById('zapTopup').onclick=()=>{modal('➕ شارژ کارت زاپ','موجودی کیف پول: '+coins+' سکه',[]);a.innerHTML='<input id="zapTopupAmount" type="number" min="1" step="1" inputmode="numeric" placeholder="مبلغ شارژ به سکه" style="width:100%;padding:12px;border-radius:10px;margin:6px 0"><button id="zapTopupDo">تأیید شارژ</button>';document.getElementById('zapTopupDo').onclick=()=>{let n=Math.floor(Number(document.getElementById('zapTopupAmount').value));if(!Number.isFinite(n)||n<1){toast('مبلغ معتبر وارد کن');return}if(n>coins){toast('سکهٔ کیف پول کافی نیست');return}coins-=n;zapCard.balance=(Number(zapCard.balance)||0)+n;saveZapCard();hud();toast('کارت زاپ شارژ شد');openZapCard()}};document.getElementById('zapBuyInfo').onclick=()=>toast('هنگام خرید، رمز کارت را وارد کن تا مبلغ از موجودی کارت کم شود.');document.getElementById('zapChangePin').onclick=()=>{modal('🔐 تغییر رمز کارت زاپ','رمز فعلی و رمز جدید را وارد کن.',[]);a.innerHTML='<input id="zapOldPin" type="password" inputmode="numeric" maxlength="8" placeholder="رمز فعلی" style="width:100%;padding:12px;border-radius:10px;margin:5px 0"><input id="zapNextPin" type="password" inputmode="numeric" maxlength="8" placeholder="رمز جدید ۴ تا ۸ رقمی" style="width:100%;padding:12px;border-radius:10px;margin:5px 0"><button id="zapChangeDo">تغییر رمز</button>';document.getElementById('zapChangeDo').onclick=()=>{const old=document.getElementById('zapOldPin').value,nw=document.getElementById('zapNextPin').value;if(old!==zapCard.pin){toast('رمز فعلی اشتباه است');return}if(!/^\d{4,8}$/.test(nw)){toast('رمز جدید باید ۴ تا ۸ رقم باشد');return}zapCard.pin=nw;saveZapCard();toast('رمز کارت تغییر کرد');openZapCard()}};
+}
+function payWithZap(amount,description,onPaid){amount=Math.floor(Number(amount));if(!Number.isFinite(amount)||amount<1){toast('مبلغ خرید معتبر نیست');return}if(!zapCard.pin){toast('اول از گوشی، کارت زاپ را بساز');openZapCard();return}if((Number(zapCard.balance)||0)<amount){toast('موجودی کارت کافی نیست؛ کارت زاپ را شارژ کن');return}const a=document.getElementById('actions');modal('💳 پرداخت با کارت زاپ',description+'\nمبلغ: '+amount.toLocaleString('fa-IR')+' سکه\nموجودی کارت: '+Number(zapCard.balance||0).toLocaleString('fa-IR')+' سکه',[]);a.innerHTML='<input id="zapPayPin" type="password" inputmode="numeric" maxlength="8" placeholder="رمز کارت زاپ" style="width:100%;padding:12px;border-radius:10px;margin:8px 0"><button id="zapPayConfirm">تأیید پرداخت</button>';document.getElementById('zapPayConfirm').onclick=()=>{if(document.getElementById('zapPayPin').value!==zapCard.pin){toast('رمز کارت اشتباه است');return}if((Number(zapCard.balance)||0)<amount){toast('موجودی کارت کافی نیست');return}zapCard.balance-=amount;saveZapCard();close();onPaid();toast('پرداخت با کارت زاپ انجام شد 💳')}}
+
+
+// سیستم کشاورزی شهر آزاد: چهار قطعه زمین، بذرهای قابل خرید و زمان رشد ذخیره‌شونده
+// زمین کشاورزی در سمت جنوبی خیابان
+ const FARM={x:825,y:1650,w:290,h:180,kioskX:837,kioskY:1663};
+const farmPlotSpots=[
+ {x:915,y:1670},{x:963,y:1670},{x:915,y:1720},{x:963,y:1720}
+];
+let farmPlots=[],farmSeeds={wheat:0,banana:0},pendingSalary=0;
+try{
+ const fs=JSON.parse(localStorage.getItem('shahrAzad_farm')||localStorage.getItem('shahrAzad_farm_backup')||'{}');
+ farmPlots=Array.isArray(fs.plots)?fs.plots.slice(0,4):[];
+ while(farmPlots.length<4)farmPlots.push(null);
+ farmSeeds={wheat:Math.max(0,Number(fs.seeds?.wheat)||0),banana:Math.max(0,Number(fs.seeds?.banana)||0)};
+ pendingSalary=Math.max(0,Number(fs.pendingSalary)||0);
+}catch(e){farmPlots=[null,null,null,null];farmSeeds={wheat:0,banana:0};pendingSalary=0}
+function saveFarm(){
+ try{
+  const snapshot={version:2,savedAt:Date.now(),plots:farmPlots,seeds:farmSeeds,pendingSalary:Math.max(0,Math.floor(Number(pendingSalary)||0))};
+  const raw=JSON.stringify(snapshot);
+  localStorage.setItem('shahrAzad_farm',raw);
+  localStorage.setItem('shahrAzad_farm_backup',raw);
+  // هم‌زمان ذخیرهٔ جامع را تازه کن تا نسخهٔ قدیمی روی برداشت/پرداخت‌شده بازنویسی نشود.
+  if(typeof saveFullGame==='function')saveFullGame();
+ }catch(e){}
+}
+function cropInfo(type){
+ return type==='banana'
+  ? {name:'موز',emoji:'🍌',duration:5*60*1000,seedPrice:200,wage:40}
+  : {name:'گندم',emoji:'🌾',duration:2*60*1000,seedPrice:100,wage:40};
+}
+function cropReady(plot){return !!plot && Date.now()-Number(plot.plantedAt||0)>=cropInfo(plot.type).duration}
+function openFarmShop(){
+ if(!activeJob||activeJob.name!=='کشاورز'){toast('برای خرید بذر و کار در زمین، اول از گوشی شغل کشاورز را انتخاب کن');return}
+ modal('🏪 دکه بذر کشاورزی','بذر مورد نظرت را بخر. قیمت‌ها از سکه‌های بازی کم می‌شوند.',[
+  ['🌾 خرید بذر گندم — ۱۰۰ سکه',()=>{payCoins(100,'خرید بذر گندم',()=>{farmSeeds.wheat++;saveFarm();openFarmShop();toast('یک بذر گندم خریدی')})}],
+  ['🍌 خرید بذر موز — ۲۰۰ سکه',()=>{payCoins(200,'خرید بذر موز',()=>{farmSeeds.banana++;saveFarm();openFarmShop();toast('یک بذر موز خریدی')})}],
+  ['🎒 موجودی بذرها',()=>modal('🎒 موجودی بذرها','بذر گندم: '+farmSeeds.wheat+' عدد\nبذر موز: '+farmSeeds.banana+' عدد')]
+ ]);
+}
+function openFarm(){
+ if(!activeJob||activeJob.name!=='کشاورز'){toast('برای کار در زمین باید شغل کشاورز را داشته باشی');return}
+ const opts=farmPlots.map((plot,i)=>{
+  if(!plot)return ['🟫 قطعه '+(i+1)+' — خالی؛ کاشت بذر',()=>plantFarmPlot(i)];
+  const info=cropInfo(plot.type);
+  if(cropReady(plot))return [info.emoji+' قطعه '+(i+1)+' — '+info.name+' آماده برداشت',()=>harvestFarmPlot(i)];
+  const left=Math.max(0,info.duration-(Date.now()-Number(plot.plantedAt||0)));
+  const mins=Math.floor(left/60000),secs=Math.ceil((left%60000)/1000);
+  return [info.emoji+' قطعه '+(i+1)+' — '+info.name+'؛ زمان باقی‌مانده '+mins+':'+String(secs).padStart(2,'0'),()=>toast('محصول هنوز آماده نیست؛ کمی صبر کن')];
+ });
+ opts.push(['🏪 رفتن به دکه بذر',openFarmShop],['💰 حقوق آماده دریافت: '+pendingSalary+' سکه',claimFarmSalary]);
+ modal('🌱 زمین کشاورزی','چهار قطعه زمین داری. گندم ۲ دقیقه و موز ۵ دقیقه برای رشد زمان می‌خواهد.',opts);
+}
+function plantFarmPlot(index){
+ if(farmPlots[index]){toast('این قطعه هنوز محصول دارد');return}
+ const opts=[];
+ if(farmSeeds.wheat>0)opts.push(['🌾 کاشت گندم — رشد در ۲ دقیقه',()=>{farmSeeds.wheat--;farmPlots[index]={type:'wheat',plantedAt:Date.now()};saveFarm();openFarm();toast('گندم کاشته شد؛ ۲ دقیقه دیگر آماده برداشت است')}]);
+ if(farmSeeds.banana>0)opts.push(['🍌 کاشت موز — رشد در ۵ دقیقه',()=>{farmSeeds.banana--;farmPlots[index]={type:'banana',plantedAt:Date.now()};saveFarm();openFarm();toast('موز کاشته شد؛ ۵ دقیقه دیگر آماده برداشت است')}]);
+ if(!opts.length)opts.push(['رفتن به دکه برای خرید بذر',openFarmShop]);
+ modal('🌱 کاشت در قطعه '+(index+1),'نوع بذر را انتخاب کن.',opts);
+}
+function harvestFarmPlot(index){
+ const plot=farmPlots[index];if(!plot)return;
+ if(!cropReady(plot)){toast('محصول هنوز رشد نکرده است');return}
+ const info=cropInfo(plot.type);
+ farmPlots[index]=null;
+ pendingSalary+=info.wage;
+ saveFarm();
+ hud();
+ modal('✅ برداشت انجام شد',info.emoji+' '+info.name+' را برداشت کردی.\nحقوق این برداشت: '+info.wage+' سکه\nحقوق آماده دریافت: '+pendingSalary+' سکه',[
+  ['برداشت محصول بعدی',openFarm],
+  ['دریافت حقوق فوری',claimFarmSalary]
+ ]);
+}
+function getEarnedSalary(){
+ // ذخیرهٔ مستقل و پشتیبان با زمان جدیدتر، مرجع قطعی حقوق برداشت‌شده است.
+ try{
+  const a=JSON.parse(localStorage.getItem('shahrAzad_farm')||'null');
+  const b=JSON.parse(localStorage.getItem('shahrAzad_farm_backup')||'null');
+  const saved=[a,b].filter(v=>v&&Number.isFinite(Number(v.pendingSalary))).sort((x,y)=>(Number(y.savedAt)||0)-(Number(x.savedAt)||0))[0];
+  if(saved)pendingSalary=Math.max(0,Math.floor(Number(saved.pendingSalary)||0));
+ }catch(e){}
+ return Math.max(0,Math.floor(Number(pendingSalary)||0));
+}
+function saveEarnedSalary(value){
+ pendingSalary=Math.max(0,Math.floor(Number(value)||0));
+ saveFarm();
+}
+function claimFarmSalary(){
+ // ورود به صفحهٔ تأیید؛ تا وقتی بازیکن دکمهٔ نهایی را نزند پولی کم یا زیاد نمی‌شود.
+ const amount=getEarnedSalary();
+ if(amount<=0){toast('حقوق آمادهٔ دریافت صفر است؛ ابتدا کار کن و حقوق جمع کن');return}
+ const fee=Math.ceil(amount*0.05);
+ const net=Math.max(0,amount-fee);
+ modal('💰 پرداخت فوری حقوق','حقوق کارکرده: '+amount.toLocaleString('fa-IR')+' سکه\nکارمزد ۵٪: '+fee.toLocaleString('fa-IR')+' سکه\nمبلغی که دریافت می‌کنی: '+net.toLocaleString('fa-IR')+' سکه\nبرای واریز، دکمهٔ پرداخت فوری را بزن.',[
+  ['✅ پرداخت فوری',()=>confirmFarmSalaryPayment(amount,fee,net)],
+  ['بازگشت به بانک',openBank]
+ ]);
+}
+function confirmFarmSalaryPayment(amount,fee,net){
+ const current=getEarnedSalary();
+ if(current<=0){toast('حقوقی برای پرداخت باقی نمانده است');openBank();return}
+ // اگر مبلغ ذخیره در فاصلهٔ باز بودن صفحه تغییر کرد، مبلغ جدید محاسبه می‌شود.
+ const payAmount=Math.min(current,Math.max(0,Math.floor(Number(amount)||0)));
+ const payFee=Math.ceil(payAmount*0.05);
+ const payNet=Math.max(0,payAmount-payFee);
+ saveEarnedSalary(current-payAmount);
+ coins+=payNet;
+ saveFullGame();hud();
+ modal('✅ پرداخت انجام شد','حقوق پرداخت‌شده: '+payAmount.toLocaleString('fa-IR')+' سکه\nکارمزد ۵٪: '+payFee.toLocaleString('fa-IR')+' سکه\nواریزی به کیف پول: '+payNet.toLocaleString('fa-IR')+' سکه');
+}
+function openJobSalary(){
+ const amount=getEarnedSalary();
+ modal('💼 حقوق کارکرده','حقوقی که تا الان با کارکردن به دست آورده‌ای: '+amount.toLocaleString('fa-IR')+' سکه');
+}
+
+// حقوق کارمندی: درخواست از بانک ثبت می‌شود و دقیقاً ۵ دقیقه بعد واریز می‌شود.
+let employeeSalaryDue=0,employeeSalaryAmount=0;
+try{
+ const es=JSON.parse(localStorage.getItem('shahrAzad_employeeSalary')||'{}');
+ employeeSalaryDue=Math.max(0,Number(es.due)||0);
+ employeeSalaryAmount=Math.max(0,Number(es.amount)||0);
+}catch(e){}
+function saveEmployeeSalary(){
+ try{localStorage.setItem('shahrAzad_employeeSalary',JSON.stringify({due:employeeSalaryDue,amount:employeeSalaryAmount}))}catch(e){}
+}
+function checkEmployeeSalary(){
+ if(employeeSalaryDue && Date.now()>=employeeSalaryDue && employeeSalaryAmount>0){
+  const amount=Math.floor(employeeSalaryAmount);
+  employeeSalaryDue=0;employeeSalaryAmount=0;saveEmployeeSalary();
+  coins+=amount;hud();
+  toast('💼 حقوق کارمندی واریز شد: '+amount+' سکه');
+ }
+}
+function requestEmployeeSalary(){
+ checkEmployeeSalary();
+ if(!activeJob){toast('اول از گوشی یک شغل انتخاب کن');return}
+ if(employeeSalaryDue>Date.now()){
+  toast('درخواست حقوق قبلی هنوز در حال پردازش است');openEmployeeSalary();return;
+ }
+ employeeSalaryAmount=Math.max(40,Number(activeJob.pay)||40)*10;
+ employeeSalaryDue=Date.now()+5*60*1000;saveEmployeeSalary();
+ openEmployeeSalary();
+ toast('درخواست ثبت شد؛ حقوق ۵ دقیقهٔ دیگر واریز می‌شود');
+}
+function openEmployeeSalary(){
+ checkEmployeeSalary();
+ const a=document.getElementById('actions');
+ if(employeeSalaryDue>Date.now()){
+  const remaining=Math.ceil((employeeSalaryDue-Date.now())/1000);
+  const mins=Math.floor(remaining/60),secs=remaining%60;
+  modal('💼 حقوق کارمندی','درخواست حقوق ثبت شده است.\nمبلغ حقوق: '+employeeSalaryAmount.toLocaleString('fa-IR')+' سکه\nزمان باقی‌مانده: '+mins+':'+String(secs).padStart(2,'0')+'\nپس از پایان ۵ دقیقه، مبلغ خودکار به کیف پولت واریز می‌شود.');
+  a.innerHTML='<button id="employeeRefresh">🔄 بررسی وضعیت حقوق</button><button id="employeeBack">بازگشت به بانک</button>';
+  document.getElementById('employeeRefresh').onclick=openEmployeeSalary;
+  document.getElementById('employeeBack').onclick=openBank;
+ }else{
+  const amount=activeJob?Math.max(40,Number(activeJob.pay)||40)*10:0;
+  modal('💼 حقوق کارمندی','برای دریافت حقوق کارمندی، درخواست را ثبت کن. مبلغ '+amount.toLocaleString('fa-IR')+' سکه، دقیقاً ۵ دقیقه بعد به کیف پولت واریز می‌شود.');
+  a.innerHTML='<button id="employeeRequest">💰 ثبت درخواست حقوق کارمندی</button><button id="employeeBack">بازگشت به بانک</button>';
+  document.getElementById('employeeRequest').onclick=requestEmployeeSalary;
+  document.getElementById('employeeBack').onclick=openBank;
+ }
+}
+setInterval(checkEmployeeSalary,1000);
+
+function openInspectionCode(){
+ modal('🔎 ورود به پنل بازرسی','رمز پنل بازرسی را وارد کن.');
+ const a=document.getElementById('actions');
+ a.innerHTML='<input id="inspectionCodeInput" inputmode="numeric" autocomplete="off" placeholder="رمز بازرسی" style="padding:12px;border-radius:10px;width:100%;font-size:18px;direction:ltr;box-sizing:border-box"><button id="inspectionCodeSubmit">ورود به پنل</button>';
+ const input=document.getElementById('inspectionCodeInput');
+ document.getElementById('inspectionCodeSubmit').onclick=()=>{
+  const v=(input.value||'').trim().replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d)).replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d));
+  if(v!=='SERVER_AUTH_REQUIRED'){toast('رمز پنل بازرسی اشتباه است');return;}
+  activeJob=jobs.find(j=>j.name==='بازرس')||{name:'بازرس',icon:'🔎',pay:0,desc:'بازرسی شهر آزاد'};
+  isPresident=false;isObserver=false;
+  try{
+   localStorage.setItem('shahrAzad_activeJob','بازرس');
+   localStorage.removeItem('shahrAzad_isPresident');
+   localStorage.removeItem('shahrAzad_isObserver');
+  }catch(e){}
+  close();hud();toast('🔎 شغل شما برای دفعات بعد هم به‌عنوان بازرس ذخیره شد');inspectionPanel();
+ };
+}
+function inspectionPanel(){
+ modal('🔎 پنل بازرسی','شغل فعلی شما: بازرس • پنل مستقل بازرسی شهر آزاد');
+ const a=document.getElementById('actions');
+ a.innerHTML='<button id="inspectionFillHunger">🍲 پر کردن گرسنگی تا ۱۰۰</button><div id="inspectionHungerStatus" style="padding:10px;text-align:center;font-weight:bold">میزان سیری: '+hunger+' از ۱۰۰</div>';
+ document.getElementById('inspectionFillHunger').onclick=()=>{
+  hunger=100;hud();
+  const status=document.getElementById('inspectionHungerStatus');
+  if(status)status.textContent='میزان سیری: ۱۰۰ از ۱۰۰';
+  toast('🍲 گرسنگی کامل شد؛ ۱۰۰ از ۱۰۰');
+ };
+}
+
+// سرویس اسنپ آفلاین: انتخاب مبدأ و مقصد از روی نقشهٔ خود شهر و کرایهٔ ثابت ۵۰ سکه.
+let snapPickMode='from',snapFrom=null,snapTo=null;
+function snapMapMarkup(){
+ const marks=buildings.map((b,i)=>`<g><rect x="${b.x}" y="${b.y}" width="${b.w}" height="${b.h}" rx="28" fill="${i%2?'#f7dfad':'#f3e6c8'}" stroke="#765b36" stroke-width="18"/><rect x="${b.x+18}" y="${b.y+18}" width="${Math.max(20,b.w-36)}" height="${Math.max(20,b.h-36)}" rx="18" fill="none" stroke="#fff9e9" stroke-width="8"/><text x="${b.x+b.w/2}" y="${b.y+b.h/2}" text-anchor="middle" dominant-baseline="middle" font-size="68" font-weight="bold" fill="#27364a" stroke="#fff" stroke-width="3" paint-order="stroke">${b.name}</text></g>`).join('');
+ const pin=(pt,color,label)=>pt?`<g pointer-events="none"><circle cx="${pt.x}" cy="${pt.y}" r="75" fill="${color}" fill-opacity=".24"/><circle cx="${pt.x}" cy="${pt.y}" r="43" fill="${color}" stroke="#fff" stroke-width="15"/><text x="${pt.x}" y="${pt.y-95}" text-anchor="middle" font-size="76" font-weight="bold" fill="#102033" stroke="#fff" stroke-width="12" paint-order="stroke">${label}</text></g>`:'';
+ return `<svg id="snapMap" viewBox="0 0 ${CW} ${CH}" preserveAspectRatio="none" aria-label="نقشه شهر برای انتخاب مبدأ و مقصد">
+ <rect width="${CW}" height="${CH}" fill="#b9d9a8"/>
+ <path d="M0 280 H${CITYW} M0 608 H${CITYW} M0 936 H${CITYW} M0 1264 H${CITYW} M0 1592 H${CITYW} M${blockW} 0 V${CH} M${blockW+stepX} 0 V${CH} M${blockW+stepX*2} 0 V${CH} M${blockW+stepX*3} 0 V${CH} M${CITYW-35} 0 V${CH}" stroke="#fff" stroke-width="94" fill="none"/>
+ <path d="M0 280 H${CITYW} M0 608 H${CITYW} M0 936 H${CITYW} M0 1264 H${CITYW} M0 1592 H${CITYW}" stroke="#d6dce0" stroke-width="8" stroke-dasharray="45 30" fill="none"/>
+ <path d="M2200 857 H6200 M2200 1157 H6200" stroke="#fff" stroke-width="110" fill="none"/>
+ <path d="M2200 857 H6200 M2200 1157 H6200" stroke="#d6dce0" stroke-width="9" stroke-dasharray="55 35" fill="none"/>
+ ${marks}
+ <rect x="${FARM.x}" y="${FARM.y}" width="${FARM.w}" height="${FARM.h}" rx="28" fill="#c89a55" stroke="#fff" stroke-width="18"/>
+ <text x="${FARM.x+FARM.w/2}" y="${FARM.y+FARM.h/2}" text-anchor="middle" dominant-baseline="middle" font-size="68" font-weight="bold" fill="#fff" stroke="#76502c" stroke-width="8" paint-order="stroke">زمین کشاورزی</text>
+ ${pin(snapFrom,'#087bd1','مبدأ')}${pin(snapTo,'#e33d4e','مقصد')}
+ </svg>`;
+}
+function snapRefreshMap(){
+ const map=document.getElementById('snapMap');if(!map)return;
+ map.outerHTML=snapMapMarkup();
+}
+function snapUpdateLabels(){
+ const a=document.getElementById('snapFromLabel'),b=document.getElementById('snapToLabel');
+ if(a)a.textContent='مبدأ: '+(snapFrom?snapFrom.name:'انتخاب نشده');
+ if(b)b.textContent='مقصد: '+(snapTo?snapTo.name:'انتخاب نشده');
+}
+function openSnap(){
+ close();snapPickMode='from';snapFrom={x:p.x,y:p.y,name:'موقعیت فعلی من'};snapTo=null;
+ modal('🚕 اسنپ شهر آزاد','');
+ const m=document.getElementById('modal');m.classList.remove('phoneMode');
+ const a=document.getElementById('actions');
+ a.innerHTML=`<div id="snapPanel">
+ <div class="snapHint" style="font-size:13px;font-weight:bold">۱) مبدأ یا مقصد را انتخاب کن. ۲) روی نقشه لمس کن تا نقطه ثبت شود. کرایهٔ هر سفر ۵۰ سکه است.</div>
+ <div class="snapChoice"><button type="button" id="snapFromBtn" class="selected">📍 انتخاب مبدأ</button><button type="button" id="snapToBtn">🏁 انتخاب مقصد</button></div>
+ <div id="snapModeStatus" style="padding:9px;border-radius:10px;background:#dceeff;color:#123b5b;font-weight:bold;text-align:center;margin:7px 0">حالت انتخاب: مبدأ</div>
+ <div id="snapFromLabel" class="snapHint" style="font-weight:bold"></div><div id="snapToLabel" class="snapHint" style="font-weight:bold"></div>
+ <div id="snapMapWrap">${snapMapMarkup()}</div>
+ <button type="button" id="snapRequest" class="snapGo">🚕 درخواست ماشین — ۵۰ سکه</button>
+ <div class="snapHint">نقشهٔ شهر بزرگ‌تر و واضح‌تر شده؛ ساختمان‌ها و خیابان‌ها با رنگ‌های جدا مشخص‌اند.</div>
+ </div>`;
+ const fromBtn=document.getElementById('snapFromBtn'),toBtn=document.getElementById('snapToBtn');
+ const modeStatus=document.getElementById('snapModeStatus');
+ function setSnapMode(mode){
+  snapPickMode=mode;
+  fromBtn.classList.toggle('selected',mode==='from');
+  toBtn.classList.toggle('selected',mode==='to');
+  modeStatus.textContent=mode==='from'?'حالت انتخاب: مبدأ — حالا روی نقشه بزن':'حالت انتخاب: مقصد — حالا روی نقشه بزن';
+ }
+ fromBtn.addEventListener('click',()=>setSnapMode('from'));
+ toBtn.addEventListener('click',()=>setSnapMode('to'));
+ snapUpdateLabels();
+ const mapWrap=document.getElementById('snapMapWrap');
+ mapWrap.addEventListener('click',ev=>{
+  const el=document.getElementById('snapMap');
+  if(!el)return;
+  const r=el.getBoundingClientRect();
+  const x=Math.max(0,Math.min(CW,(ev.clientX-r.left)/r.width*CW));
+  const y=Math.max(0,Math.min(CH,(ev.clientY-r.top)/r.height*CH));
+  const b=buildings.find(v=>x>=v.x&&x<=v.x+v.w&&y>=v.y&&y<=v.y+v.h);
+  const pt={x,y,name:b?b.name:'نقطه انتخابی'};
+  if(snapPickMode==='from')snapFrom=pt;else snapTo=pt;
+  snapRefreshMap();snapUpdateLabels();
+  modeStatus.textContent=(snapPickMode==='from'?'مبدأ ثبت شد: ':'مقصد ثبت شد: ')+pt.name+' — برای تغییر، دکمهٔ بالا را بزن';
+ });
+ document.getElementById('snapRequest').addEventListener('click',()=>{
+  if(!snapFrom||!snapTo){toast('اول مبدأ و مقصد را روی نقشه انتخاب کن');return}
+  if(Math.hypot(snapTo.x-snapFrom.x,snapTo.y-snapFrom.y)<65){toast('مقصد را دورتر از مبدأ انتخاب کن');return}
+  if(coins<50){toast('برای درخواست اسنپ ۵۰ سکه لازم داری');return}
+  if(snapRide&&snapRide.phase!=='done'){toast('یک سفر اسنپ در حال انجام است');return}
+  coins-=50;hud();close();
+  const pickup=nearestRoadPoint(snapFrom.x,snapFrom.y);
+  const dropoff=nearestRoadPoint(snapTo.x,snapTo.y);
+  // تاکسی از یک تقاطع دیگر شهر حرکت می‌کند، نه از کنار بازیکن؛ بنابراین رسیدن آن فوری نیست.
+  const start=snapTaxiStart(pickup);
+  const pickupRoute=makeStreetRoute(start,pickup);
+  snapRide={x:start.x,y:start.y,dir:0,from:{...snapFrom},to:{...snapTo},dropoff,
+   pickupPoint:pickup,phase:'pickup',route:pickupRoute,index:0,
+   // زمان رسیدن مستقل از طول مسیر، دقیقاً ۴۰ ثانیه است؛ سرعت نمایشی اسنپ ۷۰ کیلومتر بر ساعت.
+   speed:70,shownSpeed:70,pickupStartedAt:performance.now(),boardReady:false};
+  document.getElementById('snapBoardBtn').style.display='none';
+  toast('🚕 درخواست ثبت شد؛ ماشین حداکثر تا ۴۰ ثانیه به مبدأ می‌رسد.');
+ });
+}
+
+// مسیر تاکسی فقط از محور خیابان‌های شبکه‌ای شهر عبور می‌کند.
+
+// مرکز خیابان‌های واقعی شبکه شهر و مسیرهای بزرگراه
+const snapRoadXs=[364,757,1150,1543,1936,2202];
+const snapRoadYs=[299,627,955,1283,1611,1939];
+const snapHighwayYs=[857,1157];
+function nearestValue(arr,v){return arr.reduce((a,b)=>Math.abs(b-v)<Math.abs(a-v)?b:a)}
+function nearestRoadPoint(x,y){
+ if(x>=2200&&y>790&&y<1235)return {x:Math.max(2202,Math.min(6200,x)),y:nearestValue(snapHighwayYs,y)};
+ return {x:nearestValue(snapRoadXs,x),y:nearestValue(snapRoadYs,y)};
+}
+function makeStreetRoute(from,to){
+ // تاکسی فقط روی محور خیابان‌ها حرکت می‌کند؛ نقطه‌های انتخابی داخل ساختمان
+ // ابتدا به نزدیک‌ترین تقاطع امن خیابان تبدیل می‌شوند.
+ const a=nearestRoadPoint(from.x,from.y),b=nearestRoadPoint(to.x,to.y);
+ const pts=[{x:a.x,y:a.y}];
+ const add=(x,y)=>{const last=pts[pts.length-1];if(Math.hypot(x-last.x,y-last.y)>2)pts.push({x,y})};
+ const highwayA=a.x>=2200&&a.y>=790&&a.y<=1235;
+ const highwayB=b.x>=2200&&b.y>=790&&b.y<=1235;
+ if(highwayA||highwayB){
+  const lane=highwayA?a.y:b.y;
+  if(!highwayA){add(2202,a.y);add(2202,lane)}
+  else add(a.x,lane);
+  if(!highwayB){add(2202,lane);add(2202,b.y);add(b.x,b.y)}
+  else add(b.x,lane);
+ }else{
+  // مسیر L شکل: فقط در امتداد مرکز خیابان‌ها، بدون عبور مورب از بلوک‌ها
+  add(b.x,a.y);add(b.x,b.y);
+ }
+ return pts.filter((v,i)=>i===0||Math.hypot(v.x-pts[i-1].x,v.y-pts[i-1].y)>2);
+}
+function snapTaxiStart(pickup){
+ const candidates=[];
+ for(const x of snapRoadXs)for(const y of snapRoadYs){
+  const d=Math.abs(x-pickup.x)+Math.abs(y-pickup.y);
+  if(d>=900)candidates.push({x,y,d});
+ }
+ candidates.sort((a,b)=>a.d-b.d);
+ return candidates[0]?{x:candidates[0].x,y:candidates[0].y}:{x:snapRoadXs[0],y:snapRoadYs[0]};
+}
+function placeOnSnapRoute(r,progress){
+ const pts=r.route;if(!pts||!pts.length)return;
+ const lengths=[];let total=0;
+ for(let i=1;i<pts.length;i++){const len=Math.hypot(pts[i].x-pts[i-1].x,pts[i].y-pts[i-1].y);lengths.push(len);total+=len;}
+ if(total<=0){r.x=pts[pts.length-1].x;r.y=pts[pts.length-1].y;r.index=pts.length;return;}
+ let remain=total*Math.max(0,Math.min(1,progress));
+ for(let i=0;i<lengths.length;i++){
+  const a=pts[i],b=pts[i+1],len=lengths[i];
+  if(remain<=len||i===lengths.length-1){
+   const t=len?Math.min(1,remain/len):1;
+   r.x=a.x+(b.x-a.x)*t;r.y=a.y+(b.y-a.y)*t;
+   r.dir=Math.atan2(b.y-a.y,b.x-a.x);r.index=i+(t>=1?1:0);return;
+  }
+  remain-=len;
+ }
+}
+
+function setSnapBoardButton(show){
+ const btn=document.getElementById('snapBoardBtn');
+ if(btn)btn.style.display=show?'block':'none';
+}
+function boardSnapTaxi(){
+ if(!snapRide||snapRide.phase!=='waiting'){toast('ماشین هنوز به مبدأ نرسیده است');return}
+ const r=snapRide;
+ r.phase='trip';r.route=makeStreetRoute({x:r.x,y:r.y},r.dropoff||r.to);r.index=0;
+ r.speed=2.5;r.boardReady=false;setSnapBoardButton(false);
+ p.x=r.x;p.y=r.y;p.car=false;p.inSnapPassenger=true;
+ toast('🚕 سوار اسنپ شدی؛ حرکت به سمت مقصد آغاز شد');
+}
+document.getElementById('snapBoardBtn').addEventListener('click',boardSnapTaxi);
+function advanceSnapRoute(){
+ if(!snapRide||snapRide.phase==='done'||snapRide.phase==='waiting')return;
+ const r=snapRide;
+ if(r.phase==='pickup'){
+  // پیشروی بر اساس ساعت واقعی؛ با افت فریم هم تاکسی دقیقاً در ثانیهٔ ۴۰ می‌رسد.
+  const elapsed=performance.now()-(r.pickupStartedAt||performance.now());
+  placeOnSnapRoute(r,elapsed/40000);
+  if(elapsed<40000)return;
+  r.index=r.route.length;
+ }
+ if(r.index>=r.route.length){
+  if(r.phase==='pickup'){
+   r.phase='waiting';r.boardReady=true;r.waitingSince=performance.now();r.speed=0;setSnapBoardButton(true);
+   toast('🚕 ماشین به مبدأ رسید و توقف کرد؛ دکمهٔ «سوار شدن به اسنپ» را بزن');
+  }else{
+   const end=r.dropoff||r.to;p.x=end.x;p.y=end.y;p.car=false;p.inSnapPassenger=false;p.dir=r.dir;
+   r.phase='done';setSnapBoardButton(false);
+   toast('✅ به مقصد رسیدی! سفر اسنپ تمام شد');
+   setTimeout(()=>{if(snapRide&&snapRide.phase==='done')snapRide=null},3500);
+  }
+  return;
+ }
+ const target=r.route[r.index],dx=target.x-r.x,dy=target.y-r.y,d=Math.hypot(dx,dy);
+ if(d<Math.max(3,r.speed)){r.x=target.x;r.y=target.y;r.index++;}
+ else{
+  const step=Math.min(r.speed,d),nx=r.x+dx/d*step,ny=r.y+dy/d*step;
+  // مانع نهایی: حتی اگر مسیر اشتباه ساخته شود تاکسی اجازه ورود به ساختمان را ندارد.
+  if(insideBuilding(nx,ny,18)){
+   const altX=insideBuilding(nx,r.y,18)?r.x:nx;
+   const altY=insideBuilding(r.x,ny,18)?r.y:ny;
+   if(altX===r.x&&altY===r.y){r.index++;return}
+   r.x=altX;r.y=altY;
+  }else{r.x=nx;r.y=ny;}
+ }
+ const next=r.route[r.index]||target;r.dir=Math.atan2(next.y-r.y,next.x-r.x);
+ if(r.phase==='trip'){p.x=r.x;p.y=r.y;p.car=false;p.inSnapPassenger=true}
+}
+function updateSnapRide(){
+ if(!snapRide||snapRide.phase==='done'||snapRide.phase==='waiting')return;
+ // ماشین اسنپ با سرعت نمایشی ۷۰ حرکت می‌کند و دقیقاً پس از ۴۰ ثانیه به مبدأ می‌رسد.
+ advanceSnapRoute();
+}
+function copyCoinStoreCard(){
+ const card='5022291533373294';
+ try{
+  const ta=document.createElement('textarea');ta.value=card;ta.style.position='fixed';ta.style.opacity='0';document.body.appendChild(ta);ta.select();
+  const ok=document.execCommand('copy');ta.remove();toast(ok?'شماره کارت کپی شد':'امکان کپی خودکار نبود؛ شماره کارت را دستی کپی کن');
+ }catch(e){toast('شماره کارت را دستی کپی کن')}
+}
+function openCoinStore(){
+ const packs=[{coins:1000,price:5000},{coins:2000,price:8000},{coins:5000,price:15000}];
+ const opts=packs.map(pack=>['🪙 '+pack.coins.toLocaleString('fa-IR')+' سکه — '+pack.price.toLocaleString('fa-IR')+' تومان',()=>showCoinStorePayment(pack)]);
+ modal('🛍️ فروشگاه سکه','بستهٔ مورد نظرت را انتخاب کن. برای پرداخت واقعی باید مبلغ را کارت‌به‌کارت کنی؛ افزودن سکه پس از تأیید واریز انجام می‌شود.',opts);
+}
+function showCoinStorePayment(pack){
+ const card='5022291533373294';
+ modal('💳 پرداخت بستهٔ سکه',
+  'بسته: '+pack.coins.toLocaleString('fa-IR')+' سکه\nمبلغ: '+pack.price.toLocaleString('fa-IR')+' تومان\n\nشماره کارت مقصد:\n'+card+'\nبه نام: امیر عباس سامنی\n\nپس از انتقال وجه، رسید را نزد خود نگه دار. این نسخه به درگاه بانکی یا سرور تأیید پرداخت متصل نیست؛ بنابراین پرداخت به‌صورت خودکار تأیید نمی‌شود و سکه‌ها خودکار اضافه نخواهند شد.',
+  [['📋 کپی شماره کارت',copyCoinStoreCard],['⬅️ بازگشت به بسته‌ها',openCoinStore]]);
+}
+function openPhone(){
+ const m=document.getElementById('modal');m.classList.add('phoneMode');
+ document.getElementById('mtitle').textContent='CITY PHONE 📱';
+ document.getElementById('mtext').textContent='گوشی شهروند • انتخاب شغل کشاورزی و خدمات شهر';
+ const a=document.getElementById('actions');a.innerHTML='';
+ const grid=document.createElement('div');grid.id='phoneApps';
+ const apps=[
+ ['🎁','کد جایزه',()=>redeemPrize()],
+ ['🎡','گردونه شانس',()=>luckyWheel()],
+ ['🇮🇷','رئیس‌جمهور',()=>presidentCode()],
+ ['🛡️','ناظر',()=>observerCode()],
+ ['🛡️','پنل رئیس‌جمهور',()=>presidentPanel()],
+ ['👁️','پنل ناظری',()=>observerPanel()],
+ ['🔎','پنل بازرسی',()=>openInspectionCode()],
+ ['🟢','عضویت روبیکا',()=>{window.open('https://rubika.ir/oietuwoo89','_blank','noopener');}],
+ ['👤','تغییر نام - 50 🪙',()=>renamePlayer()],
+ ['🌾','شغل‌ها',()=>showJobs()],
+ ['💰','حقوق شغل',()=>openJobSalary()],
+ ['🚕','اسنپ',()=>openSnap()],
+ ['🗺️','نقشه',()=>{close();document.getElementById('map').click()}],
+ ['💳','کارت زاپ',()=>openZapCard()],
+ ['🛍️','فروشگاه سکه',()=>openCoinStore()],
+
+ ];
+ apps.forEach(([icon,label,fn])=>{let b=document.createElement('button');b.className='appTile';let i=document.createElement('span');i.textContent=icon;let t=document.createElement('span');t.textContent=label;b.append(i,t);b.onclick=()=>{m.classList.remove('phoneMode');fn()};grid.appendChild(b)});
+ a.appendChild(grid);m.style.display='block';
+}
+// اعلان آماده‌شدن گردونه برای بازیکن همین دستگاه/مرورگر
+(function setupWheelReadyNotice(){
+ const KEY='shahrAzad_luckyWheelLastSpin', COOLDOWN=6*60*60*1000;
+ const notice=document.getElementById('wheelReadyNotice');
+ const closeBtn=document.getElementById('dismissWheelNotice');
+ if(!notice) return;
+ let dismissedForThisReady=false;
+ function checkWheelReady(){
+   let last=0; try{last=Number(localStorage.getItem(KEY)||0)}catch(e){}
+   const ready=isPresident || (Date.now()-last>=COOLDOWN);
+   // ناظر هم بازیکن محسوب نمی‌شود؛ اعلان برای شهروندان عادی است.
+   if(isPresident || isObserver){notice.style.display='none';return;}
+   if(ready){if(!dismissedForThisReady) notice.style.display='block';}
+   else {notice.style.display='none';dismissedForThisReady=false;}
+ }
+ closeBtn.onclick=()=>{notice.style.display='none';dismissedForThisReady=true;};
+ checkWheelReady(); setInterval(checkWheelReady,15000);
+ window.addEventListener('storage',checkWheelReady);
+})();
+
+function luckyWheel(){
+ const COOLDOWN=6*60*60*1000, KEY='shahrAzad_luckyWheelLastSpin';
+ let lastSpin=0;try{lastSpin=Number(localStorage.getItem(KEY)||0)}catch(e){}
+ let remaining=Math.max(0,COOLDOWN-(Date.now()-lastSpin));
+ let used=!isPresident && remaining>0;
+ const fmt=ms=>{let sec=Math.ceil(ms/1000),h=Math.floor(sec/3600),m=Math.floor((sec%3600)/60),s=sec%60;return h+' ساعت '+m+' دقیقه '+s+' ثانیه'};
+ modal('🎡 گردونه شانس',isPresident?'رئیس‌جمهور می‌تواند بدون محدودیت زمانی گردونه را بچرخاند!':'برای بازیکنان عادی، هر ۶ ساعت یک بار می‌توان جایزه گرفت.');
+ const a=document.getElementById('actions');
+ a.innerHTML='<div id="wheelPointer">▼</div><div id="wheelDisk">'+
+ '<span style="position:absolute;top:27%;left:25%;transform:translate(-50%,-50%) rotate(-35deg);font-weight:bold;font-size:14px;color:white;text-shadow:0 2px 3px #000;white-space:nowrap">۱۰۰ سکه</span>'+ 
+ '<span style="position:absolute;top:27%;right:19%;transform:translate(0,-50%) rotate(35deg);font-weight:bold;font-size:14px;color:white;text-shadow:0 2px 3px #000;white-space:nowrap">۲۰۰ سکه</span>'+ 
+ '<span style="position:absolute;bottom:27%;right:15%;transform:translate(0,50%) rotate(-35deg);font-weight:bold;font-size:13px;color:#222;text-shadow:0 1px 2px #fff;white-space:nowrap">۳۵۰ سکه</span>'+ 
+ '<span style="position:absolute;bottom:18%;left:50%;transform:translate(-50%,50%);font-weight:bold;font-size:13px;color:white;text-shadow:0 2px 3px #000;white-space:nowrap">۵۰۰ سکه</span>'+ 
+ '<span style="position:absolute;bottom:27%;left:13%;transform:translate(0,50%) rotate(35deg);font-weight:bold;font-size:13px;color:white;text-shadow:0 2px 3px #000;white-space:nowrap">۱۰۰۰ سکه</span>'+ 
+ '</div><div style="text-align:center;line-height:2">جایزه‌ها روی بخش‌های رنگی گردونه مشخص شده‌اند</div><button id="spinWheel" style="font-size:17px;background:#c58a18" '+(used?'disabled':'')+'>'+(used?'⏳ منتظر بمان':'🎡 چرخاندن گردونه')+'</button><div id="wheelResult" style="text-align:center;font-size:16px;font-weight:bold;min-height:32px;margin-top:8px">'+(used?'نوبت بعدی تا '+fmt(remaining)+' دیگر':'نوبت امروزت آماده است!')+'</div>';
+ const btn=document.getElementById('spinWheel'),disk=document.getElementById('wheelDisk'),result=document.getElementById('wheelResult');
+ let spinning=false,turn=0;
+ if(used){const timer=setInterval(()=>{let left=Math.max(0,COOLDOWN-(Date.now()-lastSpin));if(left<=0){clearInterval(timer);btn.disabled=false;btn.textContent='🎡 چرخاندن گردونه';result.textContent='نوبت جدیدت آماده است!';}else result.textContent='نوبت بعدی تا '+fmt(left)+' دیگر';},1000)}
+ btn.onclick=()=>{let stored=0;try{stored=Number(localStorage.getItem(KEY)||0)}catch(e){};if(spinning||(!isPresident && Date.now()-stored<COOLDOWN)){toast('برای چرخاندن دوباره باید ۶ ساعت صبر کنی');return}spinning=true;used=!isPresident;lastSpin=Date.now();btn.disabled=true;btn.textContent='در حال چرخش…';result.textContent='';if(!isPresident){try{localStorage.setItem(KEY,String(lastSpin))}catch(e){};const notice=document.getElementById('wheelReadyNotice');if(notice)notice.style.display='none'}const sectorAngles={200:36,350:108,500:180,1000:252,100:324};const prizes=[100,200,350,500,1000];const prize=prizes[Math.floor(Math.random()*prizes.length)];const target=turn+1080+((360-sectorAngles[prize]-((turn%360)+360)%360+720)%360);turn=target;disk.style.transform='rotate('+target+'deg)';setTimeout(()=>{coins+=prize;hud();result.textContent='🎉 برنده شدی: '+prize+' سکه! '+(isPresident?'رئیس‌جمهور می‌تواند دوباره بچرخاند.':'نوبت بعدی تا ۶ ساعت دیگر');btn.textContent=isPresident?'🎡 چرخاندن دوباره':'⏳ تا ۶ ساعت دیگر';btn.disabled=!isPresident;spinning=false;},2250)};
+}
+// کد ورود ناظر: ۴۴۵۵
+function observerCode(){
+ modal('🛡️ شغل ناظر','کد شغل ناظر را وارد کن تا امکانات مدیریتی مشابه رئیس‌جمهور فعال شود.');
+ let a=document.getElementById('actions');
+ a.innerHTML='<input id="observerCodeInput" inputmode="numeric" placeholder="کد ناظر" style="padding:12px;border-radius:10px;width:100%;font-size:18px;direction:ltr"><button id="observerSubmit">ثبت کد</button>';
+ document.getElementById('observerSubmit').onclick=()=>{let v=document.getElementById('observerCodeInput').value.trim().replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d)).replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d));if(v!=='6767'){toast('کد ناظر اشتباه است');return}isObserver=true;isPresident=false;activeJob=null;try{localStorage.setItem('shahrAzad_isObserver','1');localStorage.removeItem('shahrAzad_isPresident');localStorage.removeItem('shahrAzad_activeJob');localStorage.removeItem('shahrAzad_activeJobData')}catch(e){}close();toast('شغل ناظر فعال شد 🛡️')};
+}
+function presidentCode(){
+ modal('🇮🇷 رئیس‌جمهور شهر','کد ویژه را وارد کن تا در این بازی به مقام رئیس‌جمهور برسی.');
+ let a=document.getElementById('actions');
+ a.innerHTML='<input id="presCode" inputmode="numeric" placeholder="کد دسترسی" style="padding:12px;border-radius:10px;width:100%;font-size:18px;direction:ltr"><button id="presSubmit">ثبت کد</button>';
+ document.getElementById('presSubmit').onclick=()=>{let v=document.getElementById('presCode').value.trim().replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d)).replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d));if(v!=='SERVER_AUTH_REQUIRED'){toast('کد رئیس‌جمهور اشتباه است');return}isPresident=true;isObserver=false;activeJob=null;try{localStorage.setItem('shahrAzad_isPresident','1');localStorage.removeItem('shahrAzad_isObserver');localStorage.removeItem('shahrAzad_activeJob');localStorage.removeItem('shahrAzad_activeJobData')}catch(e){}close();toast('تبریک! رئیس‌جمهور شهر شدی 🇮🇷')};
+}
+function showCityAnnouncement(msg){const wrap=document.getElementById('cityAnnouncement'),txt=document.getElementById('cityAnnouncementText');if(!wrap||!txt)return;txt.textContent=String(msg||'');wrap.style.display=msg?'block':'none';}
+function publishCityAnnouncement(msg){showCityAnnouncement(msg);try{localStorage.setItem('shahrAzad_cityAnnouncement',JSON.stringify({message:msg,time:Date.now()}))}catch(e){}}
+try{document.getElementById('dismissCityAnnouncement').onclick=()=>{document.getElementById('cityAnnouncement').style.display='none'};addEventListener('storage',e=>{if(e.key==='shahrAzad_cityAnnouncement'&&e.newValue){try{const data=JSON.parse(e.newValue);showCityAnnouncement(data.message)}catch(err){}}});const existingAnnouncement=JSON.parse(localStorage.getItem('shahrAzad_cityAnnouncement')||'null');if(existingAnnouncement&&existingAnnouncement.message)showCityAnnouncement(existingAnnouncement.message)}catch(e){}
+function requirePresident(){
+ if(!isPresident&&!isObserver){modal('🔒 پنل ویژه','برای دسترسی به پنل رئیس‌جمهور و ناظری، ابتدا کد دسترسی را وارد کن.');return false}
+ return true;
+}
+function presidentPanel(){
+ if(!isPresident){modal('🔒 پنل رئیس‌جمهور','این پنل فقط برای رئیس‌جمهور فعال است.');return;}
+ modal('🇮🇷 پنل رئیس‌جمهور','مدیریت شهروندهای همین نسخهٔ آفلاین. فهرست زیر شخصیت‌های شبیه‌سازی‌شدهٔ شهر است؛ بازیکن آنلاین واقعی وجود ندارد.');
+ const a=document.getElementById('actions');
+ a.innerHTML='<button id="presAddCoins">🪙 افزودن ۱۰۰٬۰۰۰ سکه</button><div style="padding:10px;margin:8px 0;background:#f2f5f8;border-radius:10px;color:#17212b"><label for="presSalaryAmount" style="display:block;margin-bottom:6px;font-weight:bold">💼 مبلغ حقوقی که رئیس‌جمهور اضافه می‌کند (سکه)</label><input id="presSalaryAmount" type="number" min="1" max="10000000" value="1000" style="width:100%;padding:11px;border-radius:8px;border:1px solid #bbb;box-sizing:border-box"><button id="presAddSalary" style="width:100%;margin-top:8px">➕ افزودن حقوق به کیف پول بازیکن</button></div><button id="presFillHealth">❤️ پر کردن جون تا ۱۰۰</button><button id="presHungerDown">🍽️ کم‌کردن گرسنگی ۱۰ واحد</button><button id="presHungerUp">🍲 زیادکردن سیری ۱۰ واحد</button><button id="presHungerEmpty">📉 خالی‌کردن نوار گرسنگی</button><button id="presHungerFull">🥘 پرکردن گرسنگی تا ۱۰۰</button><div id="presHungerValue" style="padding:8px;text-align:center;font-weight:bold">میزان سیری: '+hunger+' از ۱۰۰</div><button id="presFillFuel">⛽ پر کردن باک تا ۶۰ لیتر</button><button id="presClaimSalary">💰 دریافت حقوق شغل</button><button id="presView">👥 دیدن فهرست افراد</button><button id="presObserver">👁️ ورود به پنل ناظری</button><button id="presNotice">📢 اعلامیه شهر</button><div id="presDetails" style="line-height:2;margin-top:10px"></div>';
+ document.getElementById('presAddCoins').onclick=()=>{coins+=100000;hud();toast('🪙 ۱۰۰٬۰۰۰ سکه به موجودی اضافه شد!');};
+ document.getElementById('presAddSalary').onclick=()=>{const field=document.getElementById('presSalaryAmount');const amount=Math.floor(Number(field&&field.value)||0);if(!Number.isFinite(amount)||amount<1||amount>10000000){toast('مبلغ حقوق باید بین ۱ تا ۱۰٬۰۰۰٬۰۰۰ سکه باشد');return;}coins+=amount;hud();toast('💼 حقوق '+amount.toLocaleString('fa-IR')+' سکه از طرف رئیس‌جمهور به کیف پول اضافه شد');};
+ document.getElementById('presFillHealth').onclick=()=>{hp=100;hud();toast('❤️ جون کامل شد: ۱۰۰ از ۱۰۰');};
+ const refreshPresidentHunger=()=>{hunger=Math.max(0,Math.min(100,Math.round(hunger)));hud();const v=document.getElementById('presHungerValue');if(v)v.textContent='میزان سیری: '+hunger+' از ۱۰۰';};
+ document.getElementById('presHungerDown').onclick=()=>{hunger=Math.max(0,hunger-10);refreshPresidentHunger();toast('🍽️ سیری ۱۰ واحد کم شد');};
+ document.getElementById('presHungerUp').onclick=()=>{hunger=Math.min(100,hunger+10);refreshPresidentHunger();toast('🍲 سیری ۱۰ واحد بیشتر شد');};
+ document.getElementById('presHungerEmpty').onclick=()=>{hunger=0;refreshPresidentHunger();toast('📉 نوار گرسنگی خالی شد');};
+ document.getElementById('presHungerFull').onclick=()=>{hunger=100;refreshPresidentHunger();toast('🥘 نوار گرسنگی تا ۱۰۰ پر شد');};
+ document.getElementById('presFillFuel').onclick=()=>{fuelLiters=60;fuelTick=Date.now();hud();syncFuel();toast('⛽ باک تا ۶۰ لیتر پر شد!');};
+ document.getElementById('presClaimSalary').onclick=()=>openJobSalary();
+ document.getElementById('presView').onclick=()=>renderLocalRoster('presDetails',true);
+ document.getElementById('presObserver').onclick=observerPanel;
+ document.getElementById('presNotice').onclick=()=>{modal('📢 اعلامیه شهر','پیام را منتشر کن تا به‌صورت اعلامیه روی صفحهٔ بازیکن نمایش داده شود. در نسخهٔ آفلاین، پیام فقط در همین مرورگر و تب‌های بازِ همین بازی پخش می‌شود.');let box=document.getElementById('actions');box.innerHTML='<input id="cityNotice" maxlength="100" placeholder="پیام رئیس‌جمهور" style="width:100%;padding:12px;border-radius:10px"><button id="sendNotice">انتشار برای بازیکن‌ها</button>';document.getElementById('sendNotice').onclick=()=>{let msg=document.getElementById('cityNotice').value.trim();if(!msg){toast('متن اعلامیه را بنویس');return}publishCityAnnouncement(msg);close();toast('📢 اعلامیه برای بازیکن این نسخه نمایش داده شد')}};
+}
+function observerPanel(){
+ if(!requirePresident())return;
+ modal('👁️ پنل ناظری','ابزارهای نظارت روی شخصیت‌های محلی همین بازی. اخراج، شخصیت شهر را از نقشهٔ این اجرای بازی حذف می‌کند؛ بازیکن واقعی یا آنلاین را نمی‌تواند اخراج کند.');
+ const a=document.getElementById('actions');a.innerHTML='<button id="refreshRoster">🔄 به‌روزرسانی فهرست</button><button id="observerMakeGift">🎁 ساخت کد هدیه</button><div id="observerRoster" style="line-height:2;margin-top:10px"></div>';
+ document.getElementById('refreshRoster').onclick=()=>renderLocalRoster('observerRoster',true);
+ document.getElementById('observerMakeGift').onclick=observerGiftPanel;
+ renderLocalRoster('observerRoster',true);
+}
+function observerGiftPanel(){
+ modal('🎁 ساخت کد هدیه ناظر','مبلغ سکه را انتخاب کن و کد بساز. کد ساخته‌شده را به بازیکن بده تا در بخش «کد جایزه» وارد کند.');
+ const a=document.getElementById('actions');
+ a.innerHTML='<label for="observerRewardAmount">مبلغ جایزه (سکه)</label><input id="observerRewardAmount" type="number" min="1" max="100000" value="100" style="padding:10px;width:100%;border-radius:10px"><button id="observerCreateGift">ساخت کد</button><div id="observerMadeGift" style="padding:12px;direction:ltr;font-size:18px;word-break:break-word"></div><button id="observerBack">بازگشت به پنل ناظر</button>';
+ document.getElementById('observerCreateGift').onclick=()=>{const amount=Math.max(1,Math.min(100000,Number(document.getElementById('observerRewardAmount').value)||100));let code='GIFT-'+amount+'-'+Math.random().toString(36).slice(2,7).toUpperCase();while(creatorCodes[code])code='GIFT-'+amount+'-'+Math.random().toString(36).slice(2,7).toUpperCase();creatorCodes[code]=amount;try{localStorage.setItem('shahrAzad_giftCodes',JSON.stringify(creatorCodes));}catch(e){}document.getElementById('observerMadeGift').textContent=code+' = '+amount+' سکه';toast('کد هدیه ساخته شد؛ روی دستگاه‌های دیگر هم قابل ورود است');};
+ document.getElementById('observerBack').onclick=observerPanel;
+}
+// فهرست آزمایشی برای چند تب از همین فایل در یک مرورگر؛ دستگاه‌های جداگانه بدون سرور دیده نمی‌شوند.
+const rosterKey='shahrAzad_localRoster_v2';
+let localTabId='';try{localTabId=sessionStorage.getItem('shahrAzad_tabId')||'';if(!localTabId){localTabId='tab-'+Math.random().toString(36).slice(2,10);sessionStorage.setItem('shahrAzad_tabId',localTabId)}}catch(e){localTabId='tab-'+Math.random().toString(36).slice(2,10)}
+function currentPlayerName(){let n='';try{n=(sessionStorage.getItem('shahrAzad_playerName')||'').trim()}catch(e){}if(!n){try{n=(localStorage.getItem('shahrAzad_playerName')||'').trim()}catch(e){}}return n||'بازیکن'}
+let localPlayerCode='';try{localPlayerCode=localStorage.getItem('shahrAzad_playerCode')||'';if(!/^\d{10}$/.test(localPlayerCode)){localPlayerCode=sessionStorage.getItem('shahrAzad_playerCode')||''}if(!/^\d{10}$/.test(localPlayerCode)){localPlayerCode=String(Math.floor(1000000000+Math.random()*9000000000))}localStorage.setItem('shahrAzad_playerCode',localPlayerCode);sessionStorage.setItem('shahrAzad_playerCode',localPlayerCode)}catch(e){try{localPlayerCode=sessionStorage.getItem('shahrAzad_playerCode')||'';if(!/^\d{10}$/.test(localPlayerCode)){localPlayerCode=String(Math.floor(1000000000+Math.random()*9000000000));sessionStorage.setItem('shahrAzad_playerCode',localPlayerCode)}}catch(err){localPlayerCode=String(Math.floor(1000000000+Math.random()*9000000000))}}
+function readRoster(){try{const r=JSON.parse(localStorage.getItem(rosterKey)||'{}');return r&&typeof r==='object'?r:{}}catch(e){return {}}}
+function updateMyRoster(){try{const r=readRoster(),now=Date.now();for(const id of Object.keys(r)){if(!r[id]||now-Number(r[id].seen||0)>20000)delete r[id]}r[localTabId]={name:currentPlayerName(),code:localPlayerCode,seen:now};localStorage.setItem(rosterKey,JSON.stringify(r))}catch(e){}}
+function openBank(){
+ checkEmployeeSalary();
+ const a=document.getElementById('actions');
+ const amount=getEarnedSalary();
+ modal('🏦 بانک شهر آزاد','یکی از خدمات بانک را انتخاب کن.');
+ a.innerHTML='<div style="margin:4px 0 12px;padding:10px;border-radius:10px;background:#eef7ee;color:#173b20;line-height:1.9">حقوق فوری آمادهٔ دریافت: <b>'+amount.toLocaleString('fa-IR')+' سکه</b></div><button id="bankSalary" type="button">💰 پرداخت فوری</button><button id="bankEmployee" type="button">💼 حقوق کارمندی</button>';
+ document.getElementById('bankSalary').onclick=claimFarmSalary;
+ document.getElementById('bankEmployee').onclick=openEmployeeSalary;
+}
+
+const processedTransferKey='shahrAzad_processedTransfers_v1';
+function readProcessedTransfers(){try{return new Set(JSON.parse(sessionStorage.getItem(processedTransferKey)||'[]'))}catch(e){return new Set()}}
+function receiveOneTransfer(t){
+ if(!t||!t.id||t.toCode!==localPlayerCode)return;
+ const processed=readProcessedTransfers();if(processed.has(t.id))return;
+ const amount=Math.floor(Number(t.amount));if(!Number.isFinite(amount)||amount<1)return;
+ processed.add(t.id);try{sessionStorage.setItem(processedTransferKey,JSON.stringify([...processed].slice(-300)))}catch(e){}
+ coins+=amount;hud();toast('💸 '+amount+' سکه از '+(t.from||'بازیکن')+' دریافت کردی');
+}
+let bankTransferChannel=null;
+try{if(typeof BroadcastChannel!=='undefined'){bankTransferChannel=new BroadcastChannel('shahrAzad_bank_transfers');bankTransferChannel.onmessage=e=>receiveOneTransfer(e.data)}}catch(e){}
+function receivePendingTransfers(){
+ const key='shahrAzad_pendingTransfers_'+localPlayerCode;
+ try{
+   const queue=JSON.parse(localStorage.getItem(key)||'[]');
+   if(!Array.isArray(queue)||!queue.length)return;
+   // انتقال‌ها ابتدا پردازش می‌شوند؛ فقط بعد از دریافت موفق، صف پاک می‌شود.
+   for(const t of queue)receiveOneTransfer(t);
+   localStorage.setItem(key,JSON.stringify(queue.filter(t=>!t||!t.id||!readProcessedTransfers().has(t.id))));
+ }catch(e){}
+}
+addEventListener('storage',e=>{if(e.key==='shahrAzad_pendingTransfers_'+localPlayerCode)receivePendingTransfers()});
+setInterval(receivePendingTransfers,1000);
+function renderLocalRoster(target,canRemove){
+ const el=document.getElementById(target);if(!el)return;updateMyRoster();const roster=readRoster(),now=Date.now();
+ for(const id of Object.keys(roster)){if(!roster[id]||now-Number(roster[id].seen||0)>20000)delete roster[id]}
+ try{localStorage.setItem(rosterKey,JSON.stringify(roster))}catch(e){}
+ const entries=Object.entries(roster);el.innerHTML='<div style="padding:8px;background:#102b43;border-radius:10px;margin-bottom:8px">👥 بازیکن‌های شناسایی‌شده در همین مرورگر: '+entries.length+'</div><div style="font-size:12px;color:#b8d7e9;margin-bottom:8px">این فهرست آزمایشی، تب‌های بازِ همین بازی را در یک مرورگر مشترک نشان می‌دهد. بازیکنان روی گوشی‌های جداگانه بدون سرور آنلاین قابل مشاهده نیستند.</div>';
+ if(!entries.length){el.insertAdjacentHTML('beforeend','هنوز بازیکنی شناسایی نشده.');return}
+ entries.forEach(([id,player])=>{const line=document.createElement('div');line.style.cssText='display:flex;align-items:center;justify-content:space-between;gap:8px;padding:9px;border-bottom:1px solid #35506a';const label=document.createElement('span');label.textContent='🟢 '+(player.name||'بازیکن')+' • شماره ملی بازی: '+(player.code||'در حال ساخت');line.appendChild(label);const badge=document.createElement('small');badge.textContent=id===localTabId?'این تب':'تب دیگر';line.appendChild(badge);el.appendChild(line)});
+}
+updateMyRoster();setInterval(updateMyRoster,5000);addEventListener('storage',e=>{if(e.key===rosterKey){const o=document.getElementById('observerRoster');if(o&&document.getElementById('modal').style.display==='block')renderLocalRoster('observerRoster',true);const pr=document.getElementById('presDetails');if(pr&&pr.childElementCount)renderLocalRoster('presDetails',true)}});addEventListener('beforeunload',()=>{try{const r=readRoster();delete r[localTabId];localStorage.setItem(rosterKey,JSON.stringify(r))}catch(e){}});
+function creatorKey(){return 'CITY'+Math.random().toString(36).slice(2,6).toUpperCase()+'-'+Math.random().toString(36).slice(2,5).toUpperCase()}
+function redeemPrize(){
+ modal('🎁 کد جایزه','کدی را وارد کن که سازنده بازی برایت ساخته است.');
+ let a=document.getElementById('actions');a.innerHTML='<input id="prizeInput" placeholder="مثلاً CITY-AB12" style="padding:12px;border-radius:10px;width:100%;font-size:16px;direction:ltr"><button id="redeemNow">ثبت کد</button><button id="creatorOpen">پنل سازنده 🔒</button>';
+ document.getElementById('redeemNow').onclick=()=>{let code=document.getElementById('prizeInput').value.trim().toUpperCase().replace(/\s+/g,'');let reward=creatorCodes[code];if(!reward){const match=code.match(/^GIFT-(\d{1,6})-([A-Z0-9]{5})$/);if(match){const amount=Number(match[1]);if(amount>=1&&amount<=100000)reward=amount}}if(!reward){toast('کد نامعتبر است');return}if(redeemedCodes.has(code)){toast('این کد قبلاً در همین دستگاه استفاده شده');return}redeemedCodes.add(code);try{localStorage.setItem('shahrAzad_redeemedGiftCodes',JSON.stringify([...redeemedCodes]));}catch(e){}coins+=reward;hud();close();toast('کد پذیرفته شد! +'+reward+' سکه')};
+ document.getElementById('creatorOpen').onclick=()=>creatorPanel();
+}
+function creatorPanel(){
+ modal('🔒 پنل سازنده','این پنل نمایشی است و رمز واقعی یا سرور ندارد. برای آزمایش آفلاین یک رمز سازنده تعریف کن.');
+ let a=document.getElementById('actions');a.innerHTML='<input id="creatorPass" type="password" placeholder="رمز سازنده" style="padding:12px;border-radius:10px;width:100%"><button id="creatorLogin">ورود به پنل</button>';
+ document.getElementById('creatorLogin').onclick=()=>{let entered=document.getElementById('creatorPass').value.trim().replace(/[۰-۹]/g,d=>'۰۱۲۳۴۵۶۷۸۹'.indexOf(d)).replace(/[٠-٩]/g,d=>'٠١٢٣٤٥٦٧٨٩'.indexOf(d));if(entered!=='SERVER_AUTH_REQUIRED'){toast('رمز سازنده اشتباه است');return}creatorPanelInside()};
+}
+function creatorPanelInside(){
+ modal('🎁 ساخت کد جایزه','رمز آزمایشی پذیرفته شد. کد و مبلغ را تعیین کن؛ این کدها فقط در همین اجرای مرورگر ذخیره می‌شوند.');
+ let a=document.getElementById('actions');a.innerHTML='<input id="rewardAmount" type="number" min="1" max="100000" value="100" style="padding:10px;width:100%;border-radius:10px"><button id="makeCode">ساخت کد جایزه</button><div id="madeCode" style="padding:10px;direction:ltr;font-size:18px"></div>';
+ document.getElementById('makeCode').onclick=()=>{
+  const input=document.getElementById('rewardAmount');
+  const amount=Math.max(1,Math.min(100000,Math.floor(Number(input&&input.value)||100)));
+  // فقط رئیس‌جمهور از پرداخت هزینه ساخت کد معاف است؛ ناظر هم باید هزینه را بپردازد.
+  const exempt=isPresident===true;
+  if(!exempt && coins<amount){toast('برای ساخت این کد سکه کافی نداری');return}
+  let code=creatorKey();
+  while(Object.prototype.hasOwnProperty.call(creatorCodes,code)) code=creatorKey();
+  creatorCodes[code]=amount;
+  try{localStorage.setItem('shahrAzad_giftCodes',JSON.stringify(creatorCodes));}catch(e){}
+  if(!exempt) coins=Math.max(0,coins-amount);
+  // hud مقدار جدید را هم در صفحه نشان می‌دهد و هم ذخیره می‌کند.
+  hud();
+  const output=document.getElementById('madeCode');
+  if(output) output.textContent=code+'  =  '+amount+' سکه';
+  toast(exempt?'کد ساخته شد؛ از حساب رئیس‌جمهور کم نشد':'کد ساخته شد؛ '+amount+' سکه از حسابت کم شد');
+};
+}
+function renamePlayer(){modal('👤 تغییر نام','تغییر نام ۵۰ سکه هزینه دارد.');let a=document.getElementById('actions');a.innerHTML='<input id="newName" maxlength="18" placeholder="نام جدید" style="padding:12px;width:100%;border-radius:10px"><button id="saveName">ذخیره - 50 سکه</button>';document.getElementById('saveName').onclick=()=>{let n=document.getElementById('newName').value.trim();if(!n){toast('نام وارد کن');return}if(coins<50){toast('سکه کافی نداری');return}coins-=50;try{localStorage.setItem('shahrAzad_playerName',n);sessionStorage.setItem('shahrAzad_playerName',n)}catch(e){}hud();updateMyRoster();close();toast('نام تغییر کرد')} }
+function showJobs(){
+ let opts=jobs.map(j=>[j.icon+' '+j.name+(j.name==='کشاورز'?(farmJobUnlocked?' • کشت و برداشت محصول':' • باز کردن با ۳۰۰ سکه'):' • درآمد '+j.pay+' سکه'),()=>{
+  if(j.name==='کشاورز'&&!farmJobUnlocked){
+   payCoins(300,'باز کردن شغل کشاورزی',()=>{
+    farmJobUnlocked=true;
+    try{localStorage.setItem('shahrAzad_farmJobUnlocked','1');localStorage.setItem('shahrAzad_activeJob',j.name);localStorage.setItem('shahrAzad_activeJobData',JSON.stringify({name:j.name,pay:j.pay,savedAt:Date.now()}))}catch(e){}
+    activeJob=j;isPresident=false;isObserver=false;
+    try{localStorage.setItem('shahrAzad_activeJob',j.name);localStorage.setItem('shahrAzad_activeJobData',JSON.stringify({name:j.name,pay:j.pay,savedAt:Date.now()}));localStorage.removeItem('shahrAzad_isPresident');localStorage.removeItem('shahrAzad_isObserver')}catch(e){}
+    if(typeof saveFullGame==='function')saveFullGame();
+    close();toast('شغل کشاورزی با موفقیت باز شد! 🌾');
+   });
+   return;
+  }
+  activeJob=j;isPresident=false;isObserver=false;
+  try{localStorage.setItem('shahrAzad_activeJob',j.name);localStorage.setItem('shahrAzad_activeJobData',JSON.stringify({name:j.name,pay:j.pay,savedAt:Date.now()}));localStorage.removeItem('shahrAzad_isPresident');localStorage.removeItem('shahrAzad_isObserver')}catch(e){}
+  // انتخاب شغل باید همان لحظه ذخیره شود؛ منتظر تایمر یا خروج از بازی نمی‌مانیم.
+  if(typeof saveFullGame==='function')saveFullGame();
+  if(j.name==='کشاورز'){
+   close();
+   toast('شغل کشاورز انتخاب شد؛ به زمین کشاورزی برو و با دکمه تعامل کار را شروع کن');
+  }else{
+   modal('💼 '+j.name,j.desc+' اسم شغل از این به بعد بالای سرت نمایش داده می‌شود. برای شروع شیفت، تأیید کن.',[
+    ['شروع شیفت',()=>{coins+=j.pay;rep++;hud();close();toast('شیفت تمام شد؛ +'+j.pay+' سکه')}]
+   ]);
+  }
+ }]);
+ modal('💼 شغل‌های ایرانی','یک شغل انتخاب کن. شغل کشاورز شامل کاشت و برداشت محصول است.',opts);
+}
+function upgradeJob(){
+ if(!activeJob){showJobs();return}
+ if(activeJob.name==='کشاورز'){openFarm();return}
+ let cost=100;if(coins<cost){toast('برای ارتقا ۱۰۰ سکه لازم داری');return}
+ coins-=cost;activeJob.pay+=15;try{localStorage.setItem('shahrAzad_activeJobData',JSON.stringify({name:activeJob.name,pay:activeJob.pay,savedAt:Date.now()}))}catch(e){}hud();modal('📈 ارتقای شغل','درآمد شغل '+activeJob.name+' بیشتر شد. درآمد مأموریت بعدی: '+activeJob.pay+' سکه.');
+}
+let mission20ClaimedToday='';
+function missions(){
+ const now=new Date(),today=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0')+'-'+String(now.getDate()).padStart(2,'0');let claimed=mission20ClaimedToday;
+ try{claimed=localStorage.getItem('shahrAzad_mission20_claimed')||''}catch(e){}
+ const done=claimed===today;
+ const reward=()=>{
+  let last=mission20ClaimedToday;try{last=localStorage.getItem('shahrAzad_mission20_claimed')||last}catch(e){}
+  if(last===today){toast('پاداش ۲۰ سکه‌ای امروز را قبلاً گرفتی؛ فردا دوباره بیا');missions();return}
+  mission20ClaimedToday=today;try{localStorage.setItem('shahrAzad_mission20_claimed',today)}catch(e){}
+  coins+=20;rep++;hud();close();toast('ماموریت روزانه انجام شد! +۲۰ سکه');
+ };
+ modal('🎯 ماموریت‌ها',done?'پاداش روزانهٔ ۲۰ سکه را امروز دریافت کرده‌ای. فردا دوباره قابل دریافت است.':'ماموریت روزانه: پاداش ۲۰ سکه فقط یک‌بار در هر روز قابل دریافت است.',[[done?'✅ پاداش امروز دریافت شده':'🎁 دریافت پاداش روزانه — ۲۰ سکه',reward],['رفتن به شغل‌ها',()=>showJobs()] ]);
+ if(done){const b=document.getElementById('actions');if(b&&b.firstElementChild){b.firstElementChild.disabled=true;b.firstElementChild.style.opacity='.55';b.firstElementChild.style.cursor='not-allowed'}}
+}
+document.getElementById('phoneQuick').onclick=openPhone;
+
+document.getElementById('map').onclick=()=>{
+ const opts=[['📍 رفتن به ورودی بزرگراه',()=>{p.x=2180;p.y=857;close();toast('رسیدی به ورودی بزرگراه')}],['🏙️ مرکز شهر',()=>{p.x=1100;p.y=970;close();toast('به مرکز شهر رفتی')}],['🌾 زمین کشاورزی',()=>{p.x=1040;p.y=1750;p.car=false;carSpeedKmh=0;drive={left:false,right:false,gas:false,brake:false};driveControls.style.display='none';steerJoy.style.display='none';joy.style.display='grid';syncCarButton();close();toast('به مزرعه رسیدی')}],['🏢 نمایشگاه ماشین',()=>{const b=buildings.find(v=>v.type==='نمایشگاه');if(b){p.x=b.x+b.w/2;p.y=b.y+b.h+55}close();toast('نزدیک نمایشگاه رسیدی')}]];
+ modal('🗺️ نقشهٔ تصویری شهر','نقشهٔ کامل شهر و بزرگراه ۴۰۰۰ متری؛ برای دیدن بخش‌های مختلف، نقشه را به چپ و راست بکش.',opts);
+ const bx=buildings.map(b=>{const x=b.x,y=b.y;const label=(b.name||b.type).replace(/&/g,'&amp;').replace(/</g,'&lt;');return `<g><rect x="${x}" y="${y}" width="${b.w}" height="${b.h}" rx="22" fill="#c6b69b" stroke="#594c3d" stroke-width="9"/><rect x="${x+18}" y="${y+18}" width="${b.w-36}" height="${b.h-36}" rx="14" fill="#8b9eaa" stroke="#f4e7cf" stroke-width="5"/><text x="${x+b.w/2}" y="${y+b.h/2+9}" text-anchor="middle" font-size="38" font-weight="bold" fill="#172b36">${label}</text></g>`}).join('');
+ const farmMap=`<g><rect x="${FARM.x}" y="${FARM.y}" width="${FARM.w}" height="${FARM.h}" fill="#8a653b" stroke="#f1d39a" stroke-width="14"/><text x="${FARM.x+FARM.w/2}" y="${FARM.y+FARM.h/2}" text-anchor="middle" fill="white" font-family="Tahoma" font-size="54" font-weight="bold">🌾 زمین کشاورزی</text><rect x="${FARM.kioskX}" y="${FARM.kioskY}" width="78" height="62" fill="#d7a64b" stroke="#704322" stroke-width="8"/></g>`;
+ const px=Math.max(0,Math.min(CW,p.x)),py=Math.max(0,Math.min(CH,p.y));
+ document.getElementById('mtext').innerHTML=`<div style="margin-top:8px;background:#203b32;border-radius:12px;padding:8px"><div style="display:flex;gap:12px;flex-wrap:wrap;color:white;font:13px Tahoma;margin:2px 4px 8px"><span>🟥 موقعیت شما</span><span>🟫 ساختمان‌ها</span><span>⬛ خیابان‌ها</span><span>🟦 بزرگراه</span><span>🟫 زمین کشاورزی</span></div><div style="overflow-x:auto;overflow-y:hidden;border-radius:9px;background:#6cab69"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 6800 2050" style="display:block;width:1100px;max-width:none;height:auto;background:#6cab69"><rect width="6800" height="2050" fill="#6cab69"/><g fill="#78b875" opacity=".7">${Array.from({length:20},(_,i)=>`<rect x="${i*335}" y="0" width="300" height="2050"/>`).join('')}</g><g stroke="#465565" stroke-width="58" fill="none">${Array.from({length:5},(_,i)=>`<path d="M${335+i*393} 0V2050"/>`).join('')}${Array.from({length:6},(_,i)=>`<path d="M0 ${270+i*328}H2200"/>`).join('')}<path d="M2165 250V1300 M2165 857H2510 M2165 1157H2510 M6200 894V1157"/><path d="M2200 857H6200 M2200 1157H6200" stroke-width="74"/></g><g stroke="#f5e6a5" stroke-width="8" stroke-dasharray="55 40" fill="none"><path d="M2200 894H6200 M2200 1194H6200"/></g><g>${bx}${farmMap}</g><g fill="#fff" font-family="Tahoma" font-size="44" font-weight="bold"><text x="400" y="1980">شهر آزاد</text><text x="2250" y="790">ورودی بزرگراه</text><text x="3850" y="820">بزرگراه رفت • ۴۰۰۰ متر</text><text x="3850" y="1270">بزرگراه برگشت</text><text x="6000" y="850">دوربرگردان</text></g><g><circle cx="${px}" cy="${py}" r="54" fill="#ef3340" stroke="white" stroke-width="15"/><circle cx="${px}" cy="${py}" r="15" fill="white"/><path d="M${px} ${py-55}l-30 -48h60z" fill="#ef3340" stroke="white" stroke-width="8"/><text x="${px+75}" y="${py-55}" fill="white" stroke="#263238" stroke-width="4" paint-order="stroke" font-family="Tahoma" font-size="52" font-weight="bold">شما</text></g></svg></div><div style="color:#dcebe2;font:12px Tahoma;margin:7px 3px 1px">موقعیت فعلی: X=${Math.round(px)} ، Y=${Math.round(py)} • نقشهٔ شماتیک بر اساس چیدمان واقعی همین نسخهٔ بازی</div></div>`;
+};
+document.getElementById('phone').onclick=openPhone;
+document.getElementById('sound').onclick=()=>{sound=!sound;document.getElementById('sound').textContent=sound?'🔊 صدا':'🔇 بی‌صدا';toast(sound?'صدا روشن':'صدا خاموش')};
+// دسترسی نقش‌ها در این نسخهٔ آفلاین؛ برای امنیت واقعی باید همین بررسی در سرور انجام شود.
+// کدهای قدیمی 6719، 212345، 2637 و سایر کدهای قبلی پذیرفته نمی‌شوند.
+const ROLE_CODES = Object.freeze({ president: '676778', observer: '6767', inspector: '4555' });
+const OWNER_EMAIL = 'oowkmwowowiw@gmail.com';
+// نقش‌ها را پاک نکن؛ وضعیت آن‌ها در ذخیرهٔ جامع بازی نگهداری می‌شود.
+function normalizeRoleDigits(value) {
+  return String(value || '').trim()
+    .replace(/[۰-۹]/g, d => '۰۱۲۳۴۵۶۷۸۹'.indexOf(d))
+    .replace(/[٠-٩]/g, d => '٠١٢٣٤٥٦٧٨٩'.indexOf(d));
+}
+function roleEntryForm(title, description, placeholder, expectedCode, onSuccess, roleLabel, requireEmail=true) {
+  modal(title, description + (requireEmail ? '\nایمیل مالک و کد دسترسی را وارد کن.' : '\nفقط کد دسترسی را وارد کن.'));
+  const a = document.getElementById('actions');
+  a.innerHTML = (requireEmail ? '<input id="roleOwnerEmail" type="email" autocomplete="email" placeholder="ایمیل مالک" value="" style="padding:12px;border-radius:10px;width:100%;font-size:16px;direction:ltr;box-sizing:border-box;margin-bottom:8px">' : '') +
+    '<input id="roleSecretCode" inputmode="numeric" autocomplete="off" placeholder="' + placeholder + '" style="padding:12px;border-radius:10px;width:100%;font-size:18px;direction:ltr;box-sizing:border-box;margin-bottom:8px">' +
+    '<button id="roleEntrySubmit">ورود به ' + roleLabel + '</button>';
+  document.getElementById('roleEntrySubmit').onclick = () => {
+    const emailField = document.getElementById('roleOwnerEmail');
+    const email = emailField ? (emailField.value || '').trim().toLowerCase() : '';
+    const code = normalizeRoleDigits(document.getElementById('roleSecretCode').value);
+    if (requireEmail && email !== OWNER_EMAIL) { toast('این ایمیل مجاز نیست'); return; }
+    if (code !== expectedCode) { toast('کد اشتباه یا منقضی است'); return; }
+    onSuccess();
+  };
+}
+observerCode = function () {
+  roleEntryForm('🛡️ ورود ناظر', 'برای فعال‌کردن نقش ناظر، اطلاعات دسترسی را وارد کن.', 'کد ناظر', ROLE_CODES.observer, () => {
+    isObserver = true; isPresident = false; activeJob = null;
+    try { localStorage.setItem('shahrAzad_isObserver','1'); localStorage.removeItem('shahrAzad_isPresident'); localStorage.removeItem('shahrAzad_activeJob'); } catch (e) {}
+    saveFullGame(); close(); toast('نقش ناظر فعال شد 🛡️'); observerPanel();
+  }, 'ناظر', false);
+};
+presidentCode = function () {
+  roleEntryForm('🇮🇷 ورود رئیس‌جمهور', 'برای فعال‌کردن مقام رئیس‌جمهور شهر، اطلاعات دسترسی را وارد کن.', 'کد رئیس‌جمهور', ROLE_CODES.president, () => {
+    isPresident = true; isObserver = false; activeJob = null;
+    try { localStorage.setItem('shahrAzad_isPresident','1'); localStorage.removeItem('shahrAzad_isObserver'); localStorage.removeItem('shahrAzad_activeJob'); } catch (e) {}
+    saveFullGame(); close(); toast('تبریک! رئیس‌جمهور شهر شدی 🇮🇷'); presidentPanel();
+  }, 'رئیس‌جمهور');
+};
+openInspectionCode = function () {
+  roleEntryForm('🔎 ورود به پنل بازرسی', 'برای فعال‌کردن شغل بازرس، اطلاعات دسترسی را وارد کن.', 'کد بازرسی', ROLE_CODES.inspector, () => {
+    activeJob = jobs.find(j => j.name === 'بازرس') || {name:'بازرس',icon:'🔎',pay:0,desc:'بازرسی شهر آزاد'};
+    isPresident = false; isObserver = false;
+    try { localStorage.setItem('shahrAzad_activeJob', 'بازرس'); localStorage.removeItem('shahrAzad_isPresident'); localStorage.removeItem('shahrAzad_isObserver'); } catch (e) {}
+    saveFullGame(); close(); hud(); toast('شغل بازرس فعال شد 🔎'); inspectionPanel();
+  }, 'بازرسی', false);
+};
+// نوار اطلاع‌رسانی اتصال از صفحه حذف شده است.
+const oldSecurityNotice = document.getElementById('securityNotice');
+if (oldSecurityNotice) oldSecurityNotice.remove();
+
+// گزارش خطاهای فنی همین مرورگر برای عیب‌یابی؛ این گزارش محلی است و به سرور ارسال نمی‌شود.
+const LOCAL_DIAGNOSTIC_KEY='shahrAzad_localDiagnostics_v1';
+function recordLocalDiagnostic(kind,message){
+  try{
+    const rows=JSON.parse(localStorage.getItem(LOCAL_DIAGNOSTIC_KEY)||'[]');
+    rows.push({kind:String(kind).slice(0,40),message:String(message||'').slice(0,240),time:Date.now(),page:'4.3'});
+    localStorage.setItem(LOCAL_DIAGNOSTIC_KEY,JSON.stringify(rows.slice(-40)));
+  }catch(e){}
+}
+window.addEventListener('error',e=>recordLocalDiagnostic('runtime-error',e&&e.message));
+window.addEventListener('unhandledrejection',e=>recordLocalDiagnostic('promise-error',e&&e.reason));
+window.addEventListener('securitypolicyviolation',e=>recordLocalDiagnostic('policy-violation',(e&&e.violatedDirective)||'unknown'));
+
+// ذخیره‌سازی جامع پیشرفت بازی روی همین دستگاه و همین مرورگر
+const FULL_SAVE_KEY = 'shahrAzad_fullProgress_v1';
+function saveFullGame(){
+  try{
+    const snapshot={
+      version:1, savedAt:Date.now(),
+      player:{x:p.x,y:p.y,dir:p.dir,car:!!p.car,carColor:p.carColor||'#159a99',vehicleId:p.vehicleId||selectedCar,run:false},
+      camera:{x:cam.x,y:cam.y},
+      stats:{coins,hunger,hp,stars,rep,level},
+      job:activeJob?{name:activeJob.name,pay:activeJob.pay}:null,
+      farmJobUnlocked:!!farmJobUnlocked,
+      roles:{president:!!isPresident,observer:!!isObserver},
+      fuelLiters,
+      garage:{ownedCars,selectedCar},
+      backpack:{items:backpack,capacity:backpackCapacity},
+      skin:{ownedSkins,selectedSkin},
+      farm:{plots:farmPlots,seeds:farmSeeds,pendingSalary},
+      employeeSalary:{due:employeeSalaryDue,amount:employeeSalaryAmount},
+      zapCard,
+      sound,night,
+      collectedCoins:coinsMap.map(c=>!!c.got),
+      parkedCars:cars.filter(c=>c.playerParked).map(c=>({x:c.x,y:c.y,dir:c.dir,color:c.color,vehicleId:c.vehicleId,playerParked:true,parked:true}))
+    };
+    localStorage.setItem(FULL_SAVE_KEY,JSON.stringify(snapshot));
+    localStorage.setItem(PARKED_CARS_KEY,JSON.stringify({version:3,savedAt:snapshot.savedAt,cars:snapshot.parkedCars}));
+    // ذخیرهٔ مستقل شغل و نقش‌ها؛ حتی اگر ذخیرهٔ جامع ناقص یا قدیمی باشد.
+    if(activeJob){localStorage.setItem('shahrAzad_activeJob',activeJob.name);localStorage.setItem('shahrAzad_activeJobData',JSON.stringify({name:activeJob.name,pay:activeJob.pay,savedAt:Date.now()}));}
+    else {localStorage.removeItem('shahrAzad_activeJob');localStorage.removeItem('shahrAzad_activeJobData');}
+    localStorage.setItem('shahrAzad_isPresident',isPresident?'1':'0');
+    localStorage.setItem('shahrAzad_isObserver',isObserver?'1':'0');
+    writeGarageSnapshot();
+    return true;
+  }catch(e){return false;}
+}
+function restoreFullGame(){
+  try{
+    const s=JSON.parse(localStorage.getItem(FULL_SAVE_KEY)||'null');
+    if(!s||s.version!==1)return;
+    if(s.stats){
+      if(Number.isFinite(s.stats.coins))coins=s.stats.coins;
+      if(Number.isFinite(s.stats.hunger))hunger=s.stats.hunger;
+      if(Number.isFinite(s.stats.hp))hp=s.stats.hp;
+      if(Number.isFinite(s.stats.stars))stars=s.stats.stars;
+      if(Number.isFinite(s.stats.rep))rep=s.stats.rep;
+      if(Number.isFinite(s.stats.level))level=s.stats.level;
+    }
+    if(s.player&&Number.isFinite(s.player.x)&&Number.isFinite(s.player.y)){
+      p.x=Math.max(20,Math.min(CW-20,s.player.x));p.y=Math.max(20,Math.min(CH-20,s.player.y));
+      if(Number.isFinite(s.player.dir))p.dir=s.player.dir;
+      p.car=!!s.player.car;p.carColor=typeof s.player.carColor==='string'?s.player.carColor:'#159a99';
+      if(typeof s.player.vehicleId==='string')p.vehicleId=s.player.vehicleId;
+      p.run=false;
+    }
+    if(s.camera){if(Number.isFinite(s.camera.x))cam.x=s.camera.x;if(Number.isFinite(s.camera.y))cam.y=s.camera.y;}
+    // باز بودن شغل کشاورزی هم مستقل و هم داخل ذخیرهٔ جامع نگهداری می‌شود.
+    // وجود شغل کشاورز در ذخیرهٔ قبلی نیز به معنی پرداخت هزینه و باز شدن آن است.
+    if(s.farmJobUnlocked===true||(s.job&&s.job.name==='کشاورز')){
+      farmJobUnlocked=true;
+      try{localStorage.setItem('shahrAzad_farmJobUnlocked','1')}catch(e){}
+    }
+    // ذخیرهٔ مستقل شغل مرجع اصلی است؛ تا اطلاعات قدیمی داخل ذخیرهٔ جامع
+    // نتواند شغل تازه‌ای را که بازیکن انتخاب کرده، هنگام ورود عوض کند.
+    let savedJob=null;
+    try{
+      const jd=JSON.parse(localStorage.getItem('shahrAzad_activeJobData')||'null');
+      if(jd&&typeof jd.name==='string')savedJob=jd;
+      else {const legacy=localStorage.getItem('shahrAzad_activeJob');if(legacy)savedJob={name:legacy};}
+    }catch(e){}
+    if(!savedJob&&s.job&&typeof s.job.name==='string')savedJob=s.job;
+    if(savedJob){
+      const found=jobs.find(j=>j.name===savedJob.name);
+      if(found&&(found.name!=='کشاورز'||farmJobUnlocked)){activeJob=found;if(Number.isFinite(savedJob.pay))activeJob.pay=savedJob.pay;try{localStorage.setItem('shahrAzad_activeJob',activeJob.name);localStorage.setItem('shahrAzad_activeJobData',JSON.stringify({name:activeJob.name,pay:activeJob.pay,savedAt:Date.now()}));if(activeJob.name==='کشاورز')localStorage.setItem('shahrAzad_farmJobUnlocked','1');}catch(e){}}
+      else if(found&&found.name==='کشاورز'&&!farmJobUnlocked){activeJob=null;try{localStorage.removeItem('shahrAzad_activeJob');localStorage.removeItem('shahrAzad_activeJobData')}catch(e){}}
+    }
+    if(s.roles&&typeof s.roles==='object'){
+      isPresident=!!s.roles.president;
+      isObserver=!isPresident&&!!s.roles.observer;
+      if(isPresident||isObserver)activeJob=null;
+      try{
+        if(isPresident){localStorage.setItem('shahrAzad_isPresident','1');localStorage.removeItem('shahrAzad_isObserver');localStorage.removeItem('shahrAzad_activeJob');}
+        else if(isObserver){localStorage.setItem('shahrAzad_isObserver','1');localStorage.removeItem('shahrAzad_isPresident');localStorage.removeItem('shahrAzad_activeJob');}
+        else{localStorage.removeItem('shahrAzad_isPresident');localStorage.removeItem('shahrAzad_isObserver');}
+      }catch(e){}
+    }
+    if(Number.isFinite(s.fuelLiters))fuelLiters=Math.max(0,Math.min(60,s.fuelLiters));
+    if(s.garage&&Array.isArray(s.garage.ownedCars)){
+      const validGarageId=id=>id==='starter'||shopCars.some(c=>c.id===id);
+      ownedCars=[...new Set(['starter',...ownedCars.filter(validGarageId),...s.garage.ownedCars.filter(validGarageId)])];
+    }
+    if(s.garage&&typeof s.garage.selectedCar==='string'&&(s.garage.selectedCar==='starter'||ownedCars.includes(s.garage.selectedCar)))selectedCar=s.garage.selectedCar;
+    if(!ownedCars.includes(selectedCar))selectedCar='starter';
+    if(s.backpack&&s.backpack.items&&typeof s.backpack.items==='object')backpack=s.backpack.items;
+    if(s.backpack&&Number.isFinite(s.backpack.capacity))backpackCapacity=Math.max(3,Math.min(10,s.backpack.capacity));
+    if(s.skin){if(Array.isArray(s.skin.ownedSkins))ownedSkins=s.skin.ownedSkins.filter(id=>typeof id==='string'&&skinCatalog.some(sk=>sk.id===id));if(typeof s.skin.selectedSkin==='string'&&(s.skin.selectedSkin==='default'||ownedSkins.includes(s.skin.selectedSkin)))selectedSkin=s.skin.selectedSkin;}
+    if(s.farm){if(Array.isArray(s.farm.plots))farmPlots=s.farm.plots.slice(0,4);while(farmPlots.length<4)farmPlots.push(null);if(s.farm.seeds)farmSeeds={wheat:Math.max(0,Number(s.farm.seeds.wheat)||0),banana:Math.max(0,Number(s.farm.seeds.banana)||0)};if(Number.isFinite(s.farm.pendingSalary))pendingSalary=Math.max(0,s.farm.pendingSalary);saveFarm();}
+    if(s.employeeSalary){if(Number.isFinite(s.employeeSalary.due))employeeSalaryDue=Math.max(0,s.employeeSalary.due);if(Number.isFinite(s.employeeSalary.amount))employeeSalaryAmount=Math.max(0,s.employeeSalary.amount);saveEmployeeSalary();}
+    // رمز و موجودی کارت زاپ از ذخیرهٔ اختصاصی خوانده می‌شود تا ذخیرهٔ قدیمیِ کلی بازی آن را بازنویسی نکند.
+    try{
+      const dedicatedZap=JSON.parse(localStorage.getItem('shahrAzad_zapCard')||'null');
+      if(dedicatedZap&&typeof dedicatedZap==='object'&&/^\\d{4,8}$/.test(String(dedicatedZap.pin||''))){
+        zapCard=dedicatedZap;
+      }else if(s.zapCard&&typeof s.zapCard==='object'&&/^\\d{4,8}$/.test(String(s.zapCard.pin||''))){
+        zapCard=s.zapCard;
+        saveZapCard();
+      }
+    }catch(e){/* نگه‌داشتن کارت معتبر فعلی در صورت خرابی ذخیره */}
+    if(typeof s.sound==='boolean')sound=s.sound;if(typeof s.night==='boolean')night=s.night;
+    if(Array.isArray(s.collectedCoins))coinsMap.forEach((c,i)=>{c.got=!!s.collectedCoins[i]});
+    let restoredParked=Array.isArray(s.parkedCars)?s.parkedCars:[];
+    try{const extra=JSON.parse(localStorage.getItem(PARKED_CARS_KEY)||'null');if(extra&&Array.isArray(extra.cars)&&Number(extra.savedAt||0)>=Number(s.savedAt||0))restoredParked=extra.cars;}catch(e){}
+    if(restoredParked.length||Array.isArray(s.parkedCars)){cars.splice(0,cars.length,...restoredParked.filter(c=>c&&Number.isFinite(c.x)&&Number.isFinite(c.y)).map(c=>({...c,playerParked:true,parked:true})));}
+  }catch(e){/* فایل ذخیره خراب بود؛ بازی با ذخیره‌های سالم قبلی بالا می‌آید */}
+}
+restoreFullGame();
+// ذخیرهٔ اختصاصی مزرعه مرجع نهایی است؛ مانع زنده‌شدن دوبارهٔ محصول برداشت‌شده یا حقوق پرداخت‌شده می‌شود.
+try{
+ const farmCandidates=['shahrAzad_farm','shahrAzad_farm_backup'].map(k=>{try{return JSON.parse(localStorage.getItem(k)||'null')}catch(e){return null}}).filter(v=>v&&typeof v==='object');
+ farmCandidates.sort((a,b)=>(Number(b.savedAt)||0)-(Number(a.savedAt)||0));
+ if(farmCandidates.length){const f=farmCandidates[0];farmPlots=Array.isArray(f.plots)?f.plots.slice(0,4):[null,null,null,null];while(farmPlots.length<4)farmPlots.push(null);if(f.seeds)farmSeeds={wheat:Math.max(0,Number(f.seeds.wheat)||0),banana:Math.max(0,Number(f.seeds.banana)||0)};pendingSalary=Math.max(0,Math.floor(Number(f.pendingSalary)||0));}
+}catch(e){}
+// گاراژ مستقل و نسخهٔ پشتیبان، خرید خودروها را حتی در صورت قدیمی بودن ذخیرهٔ اصلی حفظ می‌کند.
+restoreGaragePersistence();
+// محل شروع ثابت: هر بار ورود به بازی، بازیکن در مرکز شهر ظاهر می‌شود؛
+// موقعیت ذخیره‌شدهٔ قبلی فقط برای پیشرفت‌هاست و محل شروع را تغییر نمی‌دهد.
+p.x=1100;
+p.y=970;
+p.dir=0;
+p.car=false;
+p.run=false;
+p.inSnapPassenger=false;
+carSpeedKmh=0;
+drive={left:false,right:false,gas:false,brake:false};
+function syncSavedUi(){
+  try{
+    hud();syncCarButton();syncSpeedometer();syncFuel();updateBagCount();
+    document.getElementById('sound').textContent=sound?'🔊 صدا':'🔇 بی‌صدا';
+    if(p.car){driveControls.style.display='flex';joy.style.display='none';steerJoy.style.display='flex';document.getElementById('speedometer').style.display='block';document.getElementById('fuelDisplay').style.display='block';}
+    else{driveControls.style.display='none';steerJoy.style.display='none';joy.style.display='grid';document.getElementById('speedometer').style.display='none';document.getElementById('fuelDisplay').style.display='none';}
+  }catch(e){}
+}
+// ذخیرهٔ خودکار چندلایه؛ تغییرات مهم همان لحظه و بقیهٔ وضعیت مرتب ذخیره می‌شوند.
+syncSavedUi();saveFullGame();
+setInterval(saveFullGame,500);
+addEventListener('pagehide',saveFullGame);
+addEventListener('beforeunload',saveFullGame);
+addEventListener('blur',saveFullGame);
+addEventListener('freeze',saveFullGame);
+addEventListener('pageshow',()=>{try{restoreGaragePersistence()}catch(e){}});
+document.addEventListener('visibilitychange',()=>{if(document.visibilityState==='hidden')saveFullGame();});
+// پس از هر به‌روزرسانی HUD نیز همهٔ پیشرفت‌ها ثبت می‌شوند.
+const originalHudForSave=hud;
+hud=function(){originalHudForSave();saveFullGame();};
+loop();update();
+})();
+</script>
+<style>
+/* نمای سه‌بعدی واقعی WebGL؛ رابط لمسی بازی روی آن باقی می‌ماند */
+#c{visibility:visible}#world3d{position:absolute;inset:0;width:100%;height:100%;z-index:0;display:none;touch-action:none}
+#top,#hud,#joy,#right,#speedometer,#steerJoy,#driveControls,#toast,#modal,#hint,#roleTag,#showroomEnter,#restaurantEnter,#cafeEnter,#supermarketEnter,#backpackBtn,#fuelEnter,#bankEnter,#clothingEnter,#cinemaEnter,#fuelDisplay,#wheelReadyNotice,#cityAnnouncement{z-index:4}
+</style>
+<canvas id="world3d" aria-label="نمای سه بعدی شهر آزاد"></canvas>
+<script>function restoreCityFallback(){var c=document.getElementById('world3d'),old=document.getElementById('c');if(c)c.style.display='none';if(old)old.style.visibility='visible';var n=document.getElementById('toast');if(n){n.textContent='نمای سه‌بعدی در دسترس نیست؛ نمای جایگزین شهر نمایش داده شد.';n.style.display='block';}}window.addEventListener('error',function(e){if(e&&e.message&&/module|import|three|fetch/i.test(e.message))restoreCityFallback();},true);window.addEventListener('unhandledrejection',function(e){restoreCityFallback();});</script>
+
+
+<!-- مالک پروژه طبق درخواست سازنده: oowkmwowowiw@gmail.com. این یادداشت، محدودیت فنی برای کپی فایل یا ابزارهای هوش مصنوعی ایجاد نمی‌کند. -->
+</body></html>
